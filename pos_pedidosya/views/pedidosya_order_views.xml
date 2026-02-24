@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Vista lista -->
+    <record id="view_pedidosya_order_list" model="ir.ui.view">
+        <field name="name">pedidosya.order.list</field>
+        <field name="model">pedidosya.order</field>
+        <field name="arch" type="xml">
+            <list string="PedidosYa Orders" decoration-danger="state=='error'" decoration-muted="state in ('canceled','rejected')" decoration-success="state=='dispatched'">
+                <field name="create_date" string="Received"/>
+                <field name="pedidosya_order_id" string="PedidosYa ID"/>
+                <field name="platform_order_id" string="Display ID"/>
+                <field name="pos_config_id"/>
+                <field name="customer_name"/>
+                <field name="order_total" widget="monetary"/>
+                <field name="state" widget="badge"
+                    decoration-info="state=='received'"
+                    decoration-warning="state in ('accepted','preparing')"
+                    decoration-success="state in ('ready','dispatched')"
+                    decoration-danger="state in ('rejected','canceled','error')"
+                />
+                <field name="is_preorder" optional="hide"/>
+                <field name="pos_order_id" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Vista formulario -->
+    <record id="view_pedidosya_order_form" model="ir.ui.view">
+        <field name="name">pedidosya.order.form</field>
+        <field name="model">pedidosya.order</field>
+        <field name="arch" type="xml">
+            <form string="PedidosYa Order">
+                <header>
+                    <button
+                        name="action_accept"
+                        string="Accept"
+                        type="object"
+                        class="btn-primary"
+                        attrs="{'invisible': [('state', '!=', 'received')]}"
+                    />
+                    <button
+                        name="action_mark_prepared"
+                        string="Mark as Prepared"
+                        type="object"
+                        class="btn-primary"
+                        attrs="{'invisible': [('state', 'not in', ['accepted', 'preparing'])]}"
+                    />
+                    <button
+                        name="action_mark_dispatched"
+                        string="Dispatched"
+                        type="object"
+                        attrs="{'invisible': [('state', '!=', 'ready')]}"
+                    />
+                    <button
+                        name="action_reject"
+                        string="Reject"
+                        type="object"
+                        class="btn-danger"
+                        attrs="{'invisible': [('state', 'not in', ['received', 'accepted'])]}"
+                    />
+                    <field name="state" widget="statusbar"
+                        statusbar_visible="received,accepted,ready,dispatched"
+                    />
+                </header>
+                <sheet>
+                    <group>
+                        <group string="PedidosYa Info">
+                            <field name="pedidosya_order_id"/>
+                            <field name="platform_order_id"/>
+                            <field name="pedidosya_vendor_id"/>
+                            <field name="pos_config_id"/>
+                            <field name="is_preorder"/>
+                            <field name="estimated_pickup_time"/>
+                        </group>
+                        <group string="Customer">
+                            <field name="customer_name"/>
+                            <field name="customer_phone"/>
+                            <field name="delivery_address"/>
+                            <field name="order_total" widget="monetary"/>
+                        </group>
+                    </group>
+                    <group string="Odoo">
+                        <field name="pos_order_id"/>
+                    </group>
+                    <group string="Timestamps" attrs="{'invisible': [('state', '=', 'received')]}">
+                        <field name="accepted_at" readonly="1"/>
+                        <field name="prepared_at" readonly="1"/>
+                        <field name="dispatched_at" readonly="1"/>
+                        <field name="canceled_at" readonly="1"/>
+                    </group>
+                    <group string="Error" attrs="{'invisible': [('state', '!=', 'error')]}">
+                        <field name="error_message" readonly="1"/>
+                    </group>
+                    <group string="Raw Payload" groups="base.group_no_one">
+                        <field name="raw_payload" readonly="1" widget="text"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_pedidosya_orders" model="ir.actions.act_window">
+        <field name="name">PedidosYa Orders</field>
+        <field name="res_model">pedidosya.order</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_group_by_state': 1}</field>
+    </record>
+
+    <!-- Menú -->
+    <menuitem
+        id="menu_pedidosya_root"
+        name="PedidosYa"
+        parent="point_of_sale.menu_point_root"
+        sequence="99"
+    />
+    <menuitem
+        id="menu_pedidosya_orders"
+        name="Orders"
+        parent="menu_pedidosya_root"
+        action="action_pedidosya_orders"
+        sequence="1"
+    />
+
+</odoo>
