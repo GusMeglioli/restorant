@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
-    <!-- Heredar la vista de configuración del POS -->
     <record id="view_pos_config_form_pedidosya" model="ir.ui.view">
         <field name="name">pos.config.form.pedidosya</field>
         <field name="model">pos.config</field>
@@ -12,10 +10,10 @@
                     <group string="Integration Settings">
                         <field name="pedidosya_enabled" widget="boolean_toggle"/>
                     </group>
-                    <group attrs="{'invisible': [('pedidosya_enabled', '=', False)]}">
+                    <group invisible="not pedidosya_enabled">
                         <group string="Vendor Configuration">
-                            <field name="pedidosya_vendor_id" required="pedidosya_enabled"/>
-                            <field name="pedidosya_remote_id" required="pedidosya_enabled"/>
+                            <field name="pedidosya_vendor_id"/>
+                            <field name="pedidosya_remote_id"/>
                             <field name="pedidosya_country"/>
                             <field name="pedidosya_integration_type"/>
                             <field name="pedidosya_auto_accept"/>
@@ -25,19 +23,9 @@
                             <field name="pedidosya_plugin_password" password="True"/>
                             <field name="pedidosya_middleware_url"/>
                         </group>
-                        <group string="Webhook URL (register in PedidosYa Portal)">
-                            <field
-                                name="pedidosya_remote_id"
-                                string="Your Webhook URL"
-                                readonly="1"
-                                widget="char"
-                                attrs="{'invisible': [('pedidosya_remote_id', '=', False)]}"
-                            />
-                        </group>
                     </group>
                 </page>
             </xpath>
         </field>
     </record>
-
 </odoo>
