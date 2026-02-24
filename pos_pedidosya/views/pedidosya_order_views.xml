@@ -71,6 +71,21 @@
                     <group string="Raw Payload" groups="base.group_no_one">
                         <field name="raw_payload" readonly="1" widget="text"/>
                     </group>
+                    <notebook>
+    <page string="Order Lines" name="order_lines">
+        <field name="order_line_ids">
+            <list>
+                <field name="remote_code"/>
+                <field name="product_name"/>
+                <field name="product_id"/>
+                <field name="quantity"/>
+                <field name="unit_price"/>
+                <field name="subtotal"/>
+                <field name="notes"/>
+            </list>
+        </field>
+    </page>
+</notebook>
                 </sheet>
             </form>
         </field>
