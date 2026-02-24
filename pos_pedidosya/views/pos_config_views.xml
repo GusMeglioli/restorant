@@ -5,26 +5,58 @@
         <field name="model">pos.config</field>
         <field name="inherit_id" ref="point_of_sale.pos_config_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//notebook" position="inside">
-                <page string="PedidosYa" name="pedidosya_tab">
-                    <group string="Integration Settings">
-                        <field name="pedidosya_enabled" widget="boolean_toggle"/>
-                    </group>
-                    <group invisible="not pedidosya_enabled">
-                        <group string="Vendor Configuration">
-                            <field name="pedidosya_vendor_id"/>
-                            <field name="pedidosya_remote_id"/>
-                            <field name="pedidosya_country"/>
-                            <field name="pedidosya_integration_type"/>
-                            <field name="pedidosya_auto_accept"/>
-                        </group>
-                        <group string="Authentication">
-                            <field name="pedidosya_plugin_username"/>
-                            <field name="pedidosya_plugin_password" password="True"/>
-                            <field name="pedidosya_middleware_url"/>
-                        </group>
-                    </group>
-                </page>
+            <xpath expr="//setting[@id='other_devices']" position="after">
+                <setting string="PedidosYa"
+                         help="Recibí pedidos online de PedidosYa directo en tu POS">
+                    <field name="pedidosya_enabled" widget="boolean_toggle"/>
+                    <div class="content-group mt16"
+                         invisible="not pedidosya_enabled">
+                        <div class="row mb-2">
+                            <label for="pedidosya_vendor_id"
+                                   class="col-lg-4 o_light_label"/>
+                            <field name="pedidosya_vendor_id" class="col-lg-8"/>
+                        </div>
+                        <div class="row mb-2">
+                            <label for="pedidosya_remote_id"
+                                   class="col-lg-4 o_light_label"/>
+                            <field name="pedidosya_remote_id" class="col-lg-8"/>
+                        </div>
+                        <div class="row mb-2">
+                            <label for="pedidosya_country"
+                                   class="col-lg-4 o_light_label"/>
+                            <field name="pedidosya_country" class="col-lg-8"/>
+                        </div>
+                        <div class="row mb-2">
+                            <label for="pedidosya_integration_type"
+                                   class="col-lg-4 o_light_label"/>
+                            <field name="pedidosya_integration_type"
+                                   class="col-lg-8"/>
+                        </div>
+                        <div class="row mb-2">
+                            <label for="pedidosya_auto_accept"
+                                   class="col-lg-4 o_light_label"/>
+                            <field name="pedidosya_auto_accept" class="col-lg-8"/>
+                        </div>
+                        <div class="row mb-2">
+                            <label for="pedidosya_plugin_username"
+                                   class="col-lg-4 o_light_label"/>
+                            <field name="pedidosya_plugin_username"
+                                   class="col-lg-8"/>
+                        </div>
+                        <div class="row mb-2">
+                            <label for="pedidosya_plugin_password"
+                                   class="col-lg-4 o_light_label"/>
+                            <field name="pedidosya_plugin_password"
+                                   password="True" class="col-lg-8"/>
+                        </div>
+                        <div class="row mb-2">
+                            <label for="pedidosya_middleware_url"
+                                   class="col-lg-4 o_light_label"/>
+                            <field name="pedidosya_middleware_url"
+                                   class="col-lg-8"/>
+                        </div>
+                    </div>
+                </setting>
             </xpath>
         </field>
     </record>
