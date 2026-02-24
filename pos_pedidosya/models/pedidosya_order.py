@@ -76,6 +76,12 @@ class PedidosYaOrder(models.Model):
     order_total = fields.Float(string='Order Total')
     estimated_pickup_time = fields.Datetime(string='Estimated Pickup Time')
     is_preorder = fields.Boolean(string='Is Preorder', default=False)
+    
+    order_line_ids = fields.One2many(
+        comodel_name='pedidosya.order.line',
+        inverse_name='order_id',
+        string='Order Lines',
+    )
 
     # ── Auditoría ─────────────────────────────────────────────────────────────
     accepted_at = fields.Datetime(string='Accepted At')
