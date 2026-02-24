@@ -161,7 +161,25 @@ class PosOrder(models.Model):
         })
 
         pos_order.write({'pedidosya_order_id': pedidosya_order.id})
-
+        
+        # ── Crear líneas en pedidosya.order.line ──────────────────
+        for product_data in order_data.get('products', []):
+            remote_code = str(product_data.get('id', ''))
+            product = self.env['product.product'].search([
+                ('default_code', '=', remote_code),
+                ('available_in_pos', '=', True),
+            ], limit=1)
+            self.env['pedidosya.order.line'].create({
+                'order_id': pedidosya_order.id,
+                'product_id': product.id if product else False,
+                'remote_code': remote_code,
+                'product_name': product_data.get('name', ''),
+                'quantity': float(product_data.get('quantity', 1)),
+                'unit_price': float(product_data.get('unitPrice', 0.0)),
+                'notes': product_data.get('comment', ''),
+            })
+        # ────────────────────────────────────────────────────────────────
+        
         _logger.info(
             'PedidosYa order %s created as POS order %s.',
             order_id,
