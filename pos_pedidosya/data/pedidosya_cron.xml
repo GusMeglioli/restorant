@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="1">
+
+        <!-- Reconciliación diaria de pedidos -->
         <record id="ir_cron_pedidosya_reconcile" model="ir.cron">
             <field name="name">PedidosYa: Daily Order Reconciliation</field>
             <field name="model_id" ref="base.model_res_partner"/>
@@ -12,6 +14,8 @@
             <field name="active">True</field>
             <field name="user_id" ref="base.user_root"/>
         </record>
+
+        <!-- Control automático de horarios (cada 15 minutos) -->
         <record id="ir_cron_pedidosya_schedule_check" model="ir.cron">
             <field name="name">PedidosYa: Verificar horarios de apertura</field>
             <field name="model_id" ref="point_of_sale.model_pos_config"/>
@@ -23,5 +27,6 @@
             <field name="active">True</field>
             <field name="user_id" ref="base.user_root"/>
         </record>
+
     </data>
 </odoo>

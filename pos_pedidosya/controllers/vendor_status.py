@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from odoo import http, fields
 from odoo.http import request
+import json
 import logging
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 _logger = logging.getLogger(__name__)
 
@@ -10,21 +11,25 @@ _logger = logging.getLogger(__name__)
 class VendorStatusController(http.Controller):
 
     def _get_pos_config(self):
+        """Obtiene el pos.config con PedidosYa activo."""
         return request.env['pos.config'].sudo().search(
             [('pedidosya_enabled', '=', True)], limit=1
         )
 
     @http.route('/pedidosya/vendor/status', type='jsonrpc', auth='user', methods=['POST'], csrf=False)
     def get_status(self, **kwargs):
+        """Retorna el estado actual del local + pedidos pendientes."""
         config = self._get_pos_config()
         if not config:
             return {'error': 'No PedidosYa config found'}
+
         pending = request.env['pedidosya.order'].sudo().search_count(
             [('state', 'in', ['received', 'accepted'])]
         )
         close_until = None
         if config.pedidosya_close_until:
             close_until = fields.Datetime.to_string(config.pedidosya_close_until)
+
         return {
             'is_open': config.pedidosya_is_open,
             'manual_override': config.pedidosya_manual_override,
@@ -34,6 +39,7 @@ class VendorStatusController(http.Controller):
 
     @http.route('/pedidosya/vendor/open', type='jsonrpc', auth='user', methods=['POST'], csrf=False)
     def open_vendor(self, **kwargs):
+        """Abre el local en PedidosYa manualmente."""
         config = self._get_pos_config()
         if not config:
             return {'status': 'error', 'message': 'No config'}
@@ -46,6 +52,10 @@ class VendorStatusController(http.Controller):
 
     @http.route('/pedidosya/vendor/close', type='jsonrpc', auth='user', methods=['POST'], csrf=False)
     def close_vendor(self, close_minutes=None, **kwargs):
+        """
+        Cierra el local en PedidosYa manualmente.
+        close_minutes: None = indefinido, int = minutos hasta reapertura automática
+        """
         config = self._get_pos_config()
         if not config:
             return {'status': 'error', 'message': 'No config'}
@@ -53,8 +63,13 @@ class VendorStatusController(http.Controller):
             close_until = None
             if close_minutes and int(close_minutes) > 0:
                 close_until = fields.Datetime.now() + timedelta(minutes=int(close_minutes))
+
             config.action_pedidosya_close(close_until=close_until)
-            return {'status': 'ok', 'is_open': False, 'close_until': fields.Datetime.to_string(close_until) if close_until else None}
+            return {
+                'status': 'ok',
+                'is_open': False,
+                'close_until': fields.Datetime.to_string(close_until) if close_until else None,
+            }
         except Exception as e:
             _logger.error('Vendor close error: %s', str(e))
             return {'status': 'error', 'message': str(e)}

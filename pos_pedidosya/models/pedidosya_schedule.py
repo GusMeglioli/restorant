@@ -72,16 +72,46 @@ class PedidosYaSchedule(models.Model):
         return result
 
     def is_open_at(self, day_of_week_str, current_time_float):
+        """
+        Evalúa si este horario está activo en un momento dado.
+
+        Soporta turnos que cruzan medianoche. La lógica es:
+
+        CASO A — Turno normal (ej: 11:30–15:00, 20:30–23:30):
+            El turno está activo si: open_time <= current_time < close_time
+            Y el día coincide con day_of_week.
+
+        CASO B — Turno que cruza medianoche (ej: 20:30–01:00):
+            Se evalúa desde DOS días:
+            • Desde el día de inicio: activo si current_time >= open_time
+            • Desde el día SIGUIENTE: activo si current_time < close_time
+
+        Recibe:
+            day_of_week_str:   día actual como '0'–'6' (0=Lunes)
+            current_time_float: hora actual como float (ej: 23.75 = 23:45, 0.5 = 00:30)
+        """
         if not self.active:
             return False
+
         current_day = int(day_of_week_str)
+
         if not self.crosses_midnight:
-            return (self.day_of_week == day_of_week_str and self.open_time <= current_time_float < self.close_time)
+            # Caso A — turno simple
+            return (
+                self.day_of_week == day_of_week_str
+                and self.open_time <= current_time_float < self.close_time
+            )
         else:
+            # Caso B — cruza medianoche
             schedule_day = int(self.day_of_week)
             next_day = (schedule_day + 1) % 7
+
+            # Estamos en el día de inicio y todavía no dimos medianoche
             if current_day == schedule_day and current_time_float >= self.open_time:
                 return True
+
+            # Estamos en el día siguiente y el turno todavía no cerró
             if current_day == next_day and current_time_float < self.close_time:
                 return True
+
             return False

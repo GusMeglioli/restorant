@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
+<!-- ═══ Back office: pestaña Horarios en POS config ═══════════════════════ -->
 <record id="pos_config_view_form_pedidosya_schedule" model="ir.ui.view">
     <field name="name">pos.config.form.pedidosya.schedule</field>
     <field name="model">pos.config</field>
@@ -15,12 +17,26 @@
                     </group>
                     <group string="Control manual">
                         <div>
-                            <button name="action_pedidosya_open" type="object" string="🟢 Abrir ahora" class="btn btn-success" attrs="{ 'invisible': [('pedidosya_is_open', '=', True)]}"/>
-                            <button name="action_pedidosya_toggle" type="object" string="🔴 Cerrar ahora" class="btn btn-danger" attrs="{ 'invisible': [('pedidosya_is_open', '=', False)]}"/>
+                            <button
+                                name="action_pedidosya_open"
+                                type="object"
+                                string="🟢 Abrir ahora en PedidosYa"
+                                class="btn btn-success"
+                                attrs="{'invisible': [('pedidosya_is_open', '=', True)]}"/>
+                            <button
+                                name="action_pedidosya_toggle"
+                                type="object"
+                                string="🔴 Cerrar ahora en PedidosYa"
+                                class="btn btn-danger"
+                                attrs="{'invisible': [('pedidosya_is_open', '=', False)]}"/>
                         </div>
                     </group>
                 </group>
-                <separator string="Horarios automáticos"/>
+                <separator string="Horarios automáticos de apertura"/>
+                <p class="text-muted">
+                    El sistema abrirá y cerrará el local en PedidosYa automáticamente
+                    según estos horarios. El control manual tiene prioridad.
+                </p>
                 <field name="pedidosya_schedule_ids">
                     <list editable="bottom">
                         <field name="day_of_week"/>
@@ -33,4 +49,5 @@
         </xpath>
     </field>
 </record>
+
 </odoo>
