@@ -22,7 +22,7 @@ class KitchenDisplay(http.Controller):
 
     @http.route(
         '/pedidosya/kitchen/orders',
-        type='json',
+        type='jsonrpc',
         auth='user',
         methods=['POST'],
         csrf=False,
@@ -49,7 +49,7 @@ class KitchenDisplay(http.Controller):
 
     @http.route(
         '/pedidosya/kitchen/ready/<int:order_id>',
-        type='json',
+        type='jsonrpc',
         auth='user',
         methods=['POST'],
         csrf=False,
@@ -79,7 +79,7 @@ class KitchenDisplay(http.Controller):
 
     @http.route(
         '/pedidosya/ready/orders',
-        type='json',
+        type='jsonrpc',
         auth='user',
         methods=['POST'],
         csrf=False,
@@ -105,7 +105,7 @@ class KitchenDisplay(http.Controller):
 
     @http.route(
         '/pedidosya/ready/dispatched/<int:order_id>',
-        type='json',
+        type='jsonrpc',
         auth='user',
         methods=['POST'],
         csrf=False,

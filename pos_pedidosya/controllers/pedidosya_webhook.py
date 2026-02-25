@@ -12,7 +12,7 @@ class PedidosYaWebhook(http.Controller):
 
     @http.route(
         '/pedidosya/webhook/order/<string:remote_id>',
-        type='json',
+        type='jsonrpc',
         auth='none',
         methods=['POST'],
         csrf=False,
@@ -125,7 +125,7 @@ class PedidosYaWebhook(http.Controller):
 
     @http.route(
         '/pedidosya/webhook/status/<string:remote_id>',
-        type='json',
+        type='jsonrpc',
         auth='none',
         methods=['POST'],
         csrf=False,
