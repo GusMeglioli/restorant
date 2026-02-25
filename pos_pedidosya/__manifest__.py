@@ -36,7 +36,6 @@ Funcionalidades:
             'pos_pedidosya/static/src/css/pedidosya_pos.css',
             # Templates OWL
             'pos_pedidosya/static/src/xml/pedidosya_orders_widget.xml',
-            'pos_pedidosya/static/src/xml/pedidosya_floor_patch.xml',
             # JavaScript — orden importa: widget antes que el patch
             'pos_pedidosya/static/src/js/pedidosya_orders_widget.js',
             'pos_pedidosya/static/src/js/pedidosya_floor_patch.js',
