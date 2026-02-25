@@ -41,7 +41,6 @@
             'pos_pedidosya/static/src/xml/**/*',
         ],
     },
-    'images': ['static/description/banner.png'],
     'application': True,
     'installable': True,
     'auto_install': False,
