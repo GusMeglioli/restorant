@@ -11,7 +11,7 @@
             <page string="🕐 Horarios PedidosYa" name="pedidosya_schedule">
                 <group>
                     <group string="Estado actual">
-                        <field name="pedidosya_is_open" widget="boolean_toggle"/>
+                        <field name="pedidosya_is_open"/>
                         <field name="pedidosya_manual_override" readonly="1"/>
                         <field name="pedidosya_close_until" readonly="1"/>
                     </group>
@@ -22,13 +22,13 @@
                                 type="object"
                                 string="🟢 Abrir ahora en PedidosYa"
                                 class="btn btn-success"
-                                attrs="{'invisible': [('pedidosya_is_open', '=', True)]}"/>
+                                invisible="pedidosya_is_open"/>
                             <button
                                 name="action_pedidosya_toggle"
                                 type="object"
                                 string="🔴 Cerrar ahora en PedidosYa"
                                 class="btn btn-danger"
-                                attrs="{'invisible': [('pedidosya_is_open', '=', False)]}"/>
+                                invisible="not pedidosya_is_open"/>
                         </div>
                     </group>
                 </group>
