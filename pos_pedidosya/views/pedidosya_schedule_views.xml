@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<record id="pos_config_view_form_pedidosya_schedule" model="ir.ui.view">
+    <field name="name">pos.config.form.pedidosya.schedule</field>
+    <field name="model">pos.config</field>
+    <field name="inherit_id" ref="pos_pedidosya.pos_config_view_form_pedidosya"/>
+    <field name="arch" type="xml">
+        <xpath expr="//notebook" position="inside">
+            <page string="🕐 Horarios PedidosYa" name="pedidosya_schedule">
+                <group>
+                    <group string="Estado actual">
+                        <field name="pedidosya_is_open" widget="boolean_toggle"/>
+                        <field name="pedidosya_manual_override" readonly="1"/>
+                        <field name="pedidosya_close_until" readonly="1"/>
+                    </group>
+                    <group string="Control manual">
+                        <div>
+                            <button name="action_pedidosya_open" type="object" string="🟢 Abrir ahora" class="btn btn-success" attrs="{ 'invisible': [('pedidosya_is_open', '=', True)]}"/>
+                            <button name="action_pedidosya_toggle" type="object" string="🔴 Cerrar ahora" class="btn btn-danger" attrs="{ 'invisible': [('pedidosya_is_open', '=', False)]}"/>
+                        </div>
+                    </group>
+                </group>
+                <separator string="Horarios automáticos"/>
+                <field name="pedidosya_schedule_ids">
+                    <list editable="bottom">
+                        <field name="day_of_week"/>
+                        <field name="open_time" widget="float_time"/>
+                        <field name="close_time" widget="float_time"/>
+                        <field name="active"/>
+                    </list>
+                </field>
+            </page>
+        </xpath>
+    </field>
+</record>
+</odoo>
