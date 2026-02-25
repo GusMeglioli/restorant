@@ -1,7 +1,6 @@
 /** @odoo-module **/
 
 import { Component, useState, onMounted, onWillUnmount } from "@odoo/owl";
-import { useService } from "@web/core/utils/hooks";
 
 /**
  * Diálogo que muestra los pedidos PedidosYa pendientes.
@@ -17,7 +16,6 @@ export class PedidosYaOrdersDialog extends Component {
     };
 
     setup() {
-        this.notification = useService("notification");
         this.state = useState({
             orders: this.props.orders,
             loading: {},
@@ -53,9 +51,6 @@ export class PedidosYaButton extends Component {
     static props = {};
 
     setup() {
-        this.orm = useService("orm");
-        this.notification = useService("notification");
-
         this.state = useState({
             pendingCount: 0,
             hasNew: false,
@@ -69,6 +64,28 @@ export class PedidosYaButton extends Component {
 
         onMounted(() => this._startPolling());
         onWillUnmount(() => this._stopPolling());
+    }
+
+    // ── Llamada RPC vía fetch nativo (sin depender del env del POS) ─────────
+
+    async _rpc(model, method, args = [], kwargs = {}) {
+        const response = await fetch("/web/dataset/call_kw", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                jsonrpc: "2.0",
+                method: "call",
+                params: {
+                    model,
+                    method,
+                    args,
+                    kwargs,
+                },
+            }),
+        });
+        const data = await response.json();
+        if (data.error) throw new Error(data.error.data?.message || data.error.message);
+        return data.result;
     }
 
     // ── Polling ────────────────────────────────────────────────────────────
@@ -87,35 +104,20 @@ export class PedidosYaButton extends Component {
 
     async _checkOrders() {
         try {
-            const orders = await this.orm.searchRead(
-                "pedidosya.order",
+            const result = await this._rpc("pedidosya.order", "search_read", [
                 [["state", "=", "received"]],
-                [
-                    "id",
-                    "pedidosya_order_id",
-                    "platform_order_id",
-                    "customer_name",
-                    "order_total",
-                    "create_date",
-                ],
-                { limit: 20, order: "create_date asc" }
-            );
+                ["id", "pedidosya_order_id", "platform_order_id", "customer_name", "order_total", "create_date"],
+            ], { limit: 20, order: "create_date asc" });
 
-            // Detectar si hay pedidos nuevos respecto al último ciclo
+            const orders = result || [];
             const currentIds = new Set(orders.map((o) => o.id));
             const hasNew = [...currentIds].some((id) => !this._lastKnownIds.has(id));
 
             if (hasNew && orders.length > 0) {
                 this._playAlert();
-                this.notification.add(
-                    `🛵 ${orders.length} pedido(s) nuevo(s) de PedidosYa`,
-                    { type: "warning", sticky: false }
-                );
             }
 
             this._lastKnownIds = currentIds;
-
-            // Cargar líneas de cada pedido
             const enriched = await this._loadOrderLines(orders);
 
             this.state.orders = enriched;
@@ -130,20 +132,17 @@ export class PedidosYaButton extends Component {
         if (!orders.length) return orders;
         try {
             const orderIds = orders.map((o) => o.id);
-            const lines = await this.orm.searchRead(
-                "pedidosya.order.line",
+            const lines = await this._rpc("pedidosya.order.line", "search_read", [
                 [["order_id", "in", orderIds]],
                 ["order_id", "product_name", "quantity", "unit_price", "notes"],
-                { limit: 200 }
-            );
+            ], { limit: 200 });
 
             const linesByOrder = {};
-            for (const line of lines) {
+            for (const line of lines || []) {
                 const oid = line.order_id[0];
                 if (!linesByOrder[oid]) linesByOrder[oid] = [];
                 linesByOrder[oid].push(line);
             }
-
             return orders.map((o) => ({ ...o, lines: linesByOrder[o.id] || [] }));
         } catch {
             return orders.map((o) => ({ ...o, lines: [] }));
@@ -191,24 +190,19 @@ export class PedidosYaButton extends Component {
 
     async acceptOrder(orderId) {
         try {
-            await this.orm.call("pedidosya.order", "action_accept", [[orderId]]);
-            this.notification.add("✅ Pedido aceptado", { type: "success" });
+            await this._rpc("pedidosya.order", "action_accept", [[orderId]]);
             await this._checkOrders();
         } catch {
-            this.notification.add("❌ Error al aceptar el pedido", { type: "danger" });
+            console.error("PedidosYa: error al aceptar pedido");
         }
     }
 
     async rejectOrder(orderId) {
         try {
-            await this.orm.call("pedidosya.order", "action_reject", [
-                [orderId],
-                "technical_problem",
-            ]);
-            this.notification.add("Pedido rechazado", { type: "info" });
+            await this._rpc("pedidosya.order", "action_reject", [[orderId], "technical_problem"]);
             await this._checkOrders();
         } catch {
-            this.notification.add("❌ Error al rechazar el pedido", { type: "danger" });
+            console.error("PedidosYa: error al rechazar pedido");
         }
     }
 }

@@ -1,60 +1,36 @@
 /** @odoo-module **/
 
 /**
- * Inyecta PedidosYaButton en el FloorScreen de Odoo 19 POS.
+ * Monta PedidosYaButton en el POS sin depender del FloorScreen.
  *
- * En Odoo 19 el nombre del template del FloorScreen cambió y la herencia XML
- * no es confiable. En su lugar patcheamos el componente en JS puro:
- * montamos PedidosYaButton como una OWL App independiente sobre un div
- * que insertamos en el body cuando el FloorScreen está activo.
+ * Estrategia: esperar que el DOM del POS esté listo y montar
+ * el botón como una App OWL independiente fijada al body.
+ * Así evitamos cualquier dependencia de rutas internas del POS
+ * que pueden cambiar entre versiones de Odoo.
  */
 
-import { patch } from "@web/core/utils/patch";
-import { onMounted, onWillUnmount, App } from "@odoo/owl";
-import { FloorScreen } from "@point_of_sale/app/screens/floor_screen/floor_screen";
+import { App, whenReady } from "@odoo/owl";
 import { PedidosYaButton } from "./pedidosya_orders_widget";
-import { getTemplate } from "@web/core/templates";
+import { templates } from "@web/core/assets";
+import { makeEnv, startServices } from "@web/env";
 
-patch(FloorScreen.prototype, {
-    setup() {
-        super.setup(...arguments);
-
-        this._pedidosyaContainer = null;
-        this._pedidosyaApp = null;
-
-        onMounted(() => this._mountPedidosYaButton());
-        onWillUnmount(() => this._destroyPedidosYaButton());
-    },
-
-    _mountPedidosYaButton() {
+// Montar el botón una vez que el DOM esté listo
+whenReady(() => {
+    // Esperar un tick para que el POS termine de inicializar
+    setTimeout(() => {
         try {
-            this._pedidosyaContainer = document.createElement("div");
-            this._pedidosyaContainer.id = "pedidosya-btn-root";
-            document.body.appendChild(this._pedidosyaContainer);
+            const container = document.createElement("div");
+            container.id = "pedidosya-btn-root";
+            document.body.appendChild(container);
 
-            this._pedidosyaApp = new App(PedidosYaButton, {
-                templates: getTemplate,
-                env: this.env,
+            const app = new App(PedidosYaButton, {
+                templates,
                 props: {},
             });
-            this._pedidosyaApp.mount(this._pedidosyaContainer);
+            app.mount(container);
+            console.log("PedidosYa: botón montado correctamente");
         } catch (e) {
-            console.error("PedidosYa: error al montar botón en FloorScreen", e);
+            console.error("PedidosYa: error al montar botón", e);
         }
-    },
-
-    _destroyPedidosYaButton() {
-        try {
-            if (this._pedidosyaApp) {
-                this._pedidosyaApp.destroy();
-                this._pedidosyaApp = null;
-            }
-            if (this._pedidosyaContainer && this._pedidosyaContainer.parentNode) {
-                this._pedidosyaContainer.parentNode.removeChild(this._pedidosyaContainer);
-                this._pedidosyaContainer = null;
-            }
-        } catch (e) {
-            console.error("PedidosYa: error al desmontar botón", e);
-        }
-    },
+    }, 2000);
 });
