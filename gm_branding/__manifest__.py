@@ -10,11 +10,12 @@
         'data/company_branding.xml',
     ],
     'assets': {
-        # Bundle principal de Odoo 19 (genera light + dark)
-        'web.assets_web': [
+        'web.assets_backend': [
             'gm_branding/static/src/css/gm_branding.css',
         ],
-        # POS tiene su propio bundle
+        'web.assets_frontend': [
+            'gm_branding/static/src/css/gm_branding.css',
+        ],
         'point_of_sale._assets_pos': [
             'gm_branding/static/src/css/gm_branding.css',
         ],
