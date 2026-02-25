@@ -255,7 +255,8 @@ async function markReady(orderId, btn) {
     });
     const d = await r.json();
     if (d.result && d.result.status === 'ok') {
-      const card = document.getElementById('card-' + orderId);
+      const safeCardId = 'card-' + String(orderId).replace(/[^a-zA-Z0-9_-]/g, '_');
+      const card = document.getElementById(safeCardId);
       if (card) {
         card.style.transition = 'opacity 0.4s, transform 0.4s';
         card.style.opacity = '0';
@@ -305,7 +306,8 @@ async function fetchOrders() {
     // Actualizar cards existentes o agregar nuevas
     const existing = new Set([...grid.querySelectorAll('.card')].map(c => c.id));
     orders.forEach(o => {
-      const cardId = 'card-' + o.id;
+      const safeId = String(o.id).replace(/[^a-zA-Z0-9_-]/g, '_');
+      const cardId = 'card-' + safeId;
       let card = document.getElementById(cardId);
       if (!card) {
         card = document.createElement('div');
@@ -313,8 +315,8 @@ async function fetchOrders() {
         card.id = cardId;
         grid.appendChild(card);
       }
-      const urgent = isUrgent(o.accepted_at);
-      const timerStr = elapsed(o.accepted_at);
+      const urgent = isUrgent(o.created_at || o.accepted_at);
+      const timerStr = elapsed(o.created_at || o.accepted_at);
       const linesHtml = (o.lines || []).map(l => `
         <li>
           <span class="qty">${l.quantity}x</span>
@@ -322,23 +324,36 @@ async function fetchOrders() {
             ${l.notes ? '<span class="item-note">📝 ' + l.notes + '</span>' : ''}
           </span>
         </li>`).join('');
+      // Badge de fuente con color según origen
+      const sourceBadge = {
+        'pedidosya': '<span style="background:#ff6b35;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;">' + (o.source_label||'🛵 PedidosYa') + '</span>',
+        'mesa':      '<span style="background:#1976d2;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;">' + (o.source_label||'🍽️ Mesa') + '</span>',
+        'ventanilla':'<span style="background:#388e3c;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;">' + (o.source_label||'📞 Ventanilla') + '</span>',
+      }[o.source] || '';
+      const tableStr = o.table_name ? `<span style="font-size:13px;font-weight:600;">🪑 ${o.table_name}</span>` : '';
+      const customerStr = o.customer_name ? `<div class="customer">👤 ${o.customer_name}</div>` : '';
+      const safeId = JSON.stringify(o.id);
       card.innerHTML = `
         <div class="card-header">
           <div>
-            <div class="order-num"># ${o.platform_order_id || o.id}</div>
-            <div class="customer">👤 ${o.customer_name || 'Cliente'}</div>
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px;">
+              ${sourceBadge} ${tableStr}
+            </div>
+            <div class="order-num">${o.order_ref || o.id}</div>
+            ${customerStr}
           </div>
           <div class="timer ${urgent ? 'urgent' : ''}">⏱ ${timerStr}</div>
         </div>
         <ul class="lines">${linesHtml}</ul>
-        <button class="btn-ready" onclick="markReady(${o.id}, this)">✅ LISTO — Retirar</button>
+        <button class="btn-ready" onclick="markReady(${safeId}, this)">✅ LISTO — Retirar</button>
         <button class="btn-print" onclick='printOrder(${JSON.stringify(o)})'>🖨️ Imprimir ticket</button>
       `;
     });
 
     // Eliminar cards que ya no están
+    const newSafeIds = new Set(orders.map(o => 'card-' + String(o.id).replace(/[^a-zA-Z0-9_-]/g, '_')));
     existing.forEach(id => {
-      if (!newIds.has(parseInt(id.replace('card-', '')))) {
+      if (!newSafeIds.has(id)) {
         const el = document.getElementById(id);
         if (el) el.remove();
       }

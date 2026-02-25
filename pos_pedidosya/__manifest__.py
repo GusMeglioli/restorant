@@ -37,6 +37,7 @@
     ],
     'assets': {
         'point_of_sale._assets_pos': [
+            'pos_pedidosya/static/src/css/**/*',
             'pos_pedidosya/static/src/js/**/*',
             'pos_pedidosya/static/src/xml/**/*',
         ],
