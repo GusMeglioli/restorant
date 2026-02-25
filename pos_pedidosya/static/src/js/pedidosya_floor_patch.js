@@ -244,14 +244,20 @@ function injectButton() {
 
 // ── Punto de entrada ───────────────────────────────────────────────────────
 
-// Observar el DOM hasta que el POS esté montado y luego inyectar el botón
-const observer = new MutationObserver(() => {
-    const posReady = document.querySelector(".floor-screen, .pos-content, .pos-topleft-buttons");
-    if (posReady) {
-        observer.disconnect();
-        setTimeout(injectButton, 500);
+// Esperar que document.body esté disponible antes de observar
+function startObserver() {
+    if (!document.body) {
+        setTimeout(startObserver, 50);
+        return;
     }
-});
+    const observer = new MutationObserver(() => {
+        const posReady = document.querySelector(".floor-screen, .pos-content, .pos-topleft-buttons");
+        if (posReady) {
+            observer.disconnect();
+            setTimeout(injectButton, 500);
+        }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+}
 
-observer.observe(document.body, { childList: true, subtree: true });
-
+startObserver();
