@@ -121,12 +121,19 @@ class PosOrder(models.Model):
             return pedidosya_order
 
         # Crear el pos.order
+        total_amount = float(order_data.get('totalAmount', 0.0))
         pos_order_vals = {
             'session_id': pos_session.id,
             'partner_id': False,
             'is_pedidosya': True,
             'lines': order_lines,
             'internal_note': f"PedidosYa Order #{order_data.get('displayId', order_id)}",
+            # Campos de importe obligatorios (NOT NULL en pos.order de Odoo 19)
+            'amount_tax': 0.0,
+            'amount_total': total_amount,
+            'amount_paid': 0.0,
+            'amount_return': 0.0,
+            'state': 'draft',
         }
 
         pos_order = self.create(pos_order_vals)
