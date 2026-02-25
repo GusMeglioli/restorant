@@ -1,22 +1,19 @@
 {
     'name': 'PedidosYa POS Connector',
-    'version': '19.0.1.0.0',
-    'summary': 'Integrate PedidosYa orders directly into Odoo POS Restaurant',
+    'version': '19.0.1.1.0',
+    'summary': 'Recibí pedidos de PedidosYa directo en tu POS Restaurante',
     'description': """
-        Receive PedidosYa orders automatically in Odoo Point of Sale.
-        Full integration with PedidosYa Integration Middleware API (Delivery Hero).
-        Supports direct and indirect order flow, kitchen display,
-        vendor availability management and daily order reconciliation.
+Integración completa de PedidosYa con Odoo POS Restaurant.
+Recibe pedidos automáticamente via webhook con botón en pantalla de mesas.
 
-        Features:
-        - Automatic order reception via webhook
-        - Auto-accept configurable per POS
-        - Kitchen Display System (KDS) integration
-        - Vendor open/close from POS interface
-        - Product catalog sync with PedidosYa
-        - Daily order reconciliation (cron)
-        - Multi-vendor support
-        - Full order lifecycle management
+Funcionalidades:
+- Recepción automática de pedidos via webhook
+- Botón flotante en pantalla de mesas con badge de pedidos pendientes
+- Alerta sonora al llegar pedidos nuevos
+- Aceptar / Rechazar pedidos desde el POS sin salir
+- Auto-aceptar configurable por POS
+- Soporte multi-local
+- Ciclo completo: recibido → aceptado → entregado / cancelado
     """,
     'author': 'GM Multiservicios',
     'website': '',
@@ -35,8 +32,15 @@
     ],
     'assets': {
         'point_of_sale._assets_pos': [
-            'pos_pedidosya/static/src/js/**/*',
-            'pos_pedidosya/static/src/xml/**/*',
+            # CSS — cargado primero
+            'pos_pedidosya/static/src/css/pedidosya_pos.css',
+            # Templates OWL
+            'pos_pedidosya/static/src/xml/pedidosya_orders_widget.xml',
+            'pos_pedidosya/static/src/xml/pedidosya_floor_patch.xml',
+            # JavaScript — orden importa: widget antes que el patch
+            'pos_pedidosya/static/src/js/pedidosya_orders_widget.js',
+            'pos_pedidosya/static/src/js/pedidosya_floor_patch.js',
+            'pos_pedidosya/static/src/js/pedidosya_notification.js',
         ],
     },
     'images': ['static/description/banner.png'],
