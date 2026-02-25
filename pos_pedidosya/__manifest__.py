@@ -32,12 +32,9 @@ Funcionalidades:
     ],
     'assets': {
         'point_of_sale._assets_pos': [
-            # CSS — cargado primero
+            # CSS
             'pos_pedidosya/static/src/css/pedidosya_pos.css',
-            # Templates OWL
-            'pos_pedidosya/static/src/xml/pedidosya_orders_widget.xml',
-            # JavaScript — orden importa: widget antes que el patch
-            'pos_pedidosya/static/src/js/pedidosya_orders_widget.js',
+            # JavaScript puro - sin dependencias OWL externas
             'pos_pedidosya/static/src/js/pedidosya_floor_patch.js',
             'pos_pedidosya/static/src/js/pedidosya_notification.js',
         ],
