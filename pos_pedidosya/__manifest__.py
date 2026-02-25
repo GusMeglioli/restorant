@@ -1,19 +1,22 @@
 {
     'name': 'PedidosYa POS Connector',
-    'version': '19.0.1.1.0',
-    'summary': 'Recibí pedidos de PedidosYa directo en tu POS Restaurante',
+    'version': '19.0.1.0.0',
+    'summary': 'Integrate PedidosYa orders directly into Odoo POS Restaurant',
     'description': """
-Integración completa de PedidosYa con Odoo POS Restaurant.
-Recibe pedidos automáticamente via webhook con botón en pantalla de mesas.
+        Receive PedidosYa orders automatically in Odoo Point of Sale.
+        Full integration with PedidosYa Integration Middleware API (Delivery Hero).
+        Supports direct and indirect order flow, kitchen display,
+        vendor availability management and daily order reconciliation.
 
-Funcionalidades:
-- Recepción automática de pedidos via webhook
-- Botón flotante en pantalla de mesas con badge de pedidos pendientes
-- Alerta sonora al llegar pedidos nuevos
-- Aceptar / Rechazar pedidos desde el POS sin salir
-- Auto-aceptar configurable por POS
-- Soporte multi-local
-- Ciclo completo: recibido → aceptado → entregado / cancelado
+        Features:
+        - Automatic order reception via webhook
+        - Auto-accept configurable per POS
+        - Kitchen Display System (KDS) integration
+        - Vendor open/close from POS interface
+        - Product catalog sync with PedidosYa
+        - Daily order reconciliation (cron)
+        - Multi-vendor support
+        - Full order lifecycle management
     """,
     'author': 'GM Multiservicios',
     'website': '',
@@ -29,14 +32,12 @@ Funcionalidades:
         'views/pedidosya_order_views.xml',
         'views/pos_config_views.xml',
         'views/res_config_settings_views.xml',
+        'views/kitchen_display_templates.xml',
     ],
     'assets': {
         'point_of_sale._assets_pos': [
-            # CSS
-            'pos_pedidosya/static/src/css/pedidosya_pos.css',
-            # JavaScript puro - sin dependencias OWL externas
-            'pos_pedidosya/static/src/js/pedidosya_floor_patch.js',
-            'pos_pedidosya/static/src/js/pedidosya_notification.js',
+            'pos_pedidosya/static/src/js/**/*',
+            'pos_pedidosya/static/src/xml/**/*',
         ],
     },
     'images': ['static/description/banner.png'],
