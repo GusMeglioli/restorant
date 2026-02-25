@@ -1,0 +1,194 @@
+/* ================================================================
+   GM Multiservicios — Branding Corporativo
+   Primario: #ff5d00 | Oscuro: #202020
+   ================================================================ */
+
+/* ── Variables globales ─────────────────────────────────────────── */
+:root {
+    --gm-orange:       #ff5d00;
+    --gm-orange-dark:  #d94e00;
+    --gm-orange-light: #ff7a2e;
+    --gm-dark:         #202020;
+    --gm-dark-mid:     #2e2e2e;
+    --gm-dark-soft:    #3a3a3a;
+    --gm-white:        #ffffff;
+    --gm-text-light:   #f0f0f0;
+}
+
+/* ================================================================
+   NAVBAR / HEADER SUPERIOR
+   ================================================================ */
+
+.o_main_navbar,
+.o_navbar {
+    background-color: var(--gm-dark) !important;
+    border-bottom: 2px solid var(--gm-orange) !important;
+}
+
+/* Logo en navbar */
+.o_main_navbar .o_menu_brand,
+.o_main_navbar .o_menu_brand:hover {
+    color: var(--gm-orange) !important;
+    font-weight: 700 !important;
+}
+
+/* Íconos y links del navbar */
+.o_main_navbar .o_nav_entry,
+.o_main_navbar .o_nav_entry:hover,
+.o_main_navbar .o_menu_sections > li > a,
+.o_main_navbar .o_menu_sections > li > a:hover {
+    color: var(--gm-text-light) !important;
+}
+
+.o_main_navbar .o_nav_entry:hover,
+.o_main_navbar .o_menu_sections > li > a:hover {
+    color: var(--gm-orange) !important;
+    background: rgba(255, 93, 0, 0.12) !important;
+}
+
+/* Menú de apps activo */
+.o_main_navbar .o_menu_sections > li.active > a,
+.o_main_navbar .o_menu_sections > li.o_active > a {
+    color: var(--gm-orange) !important;
+    border-bottom: 2px solid var(--gm-orange) !important;
+}
+
+/* Botón hamburguesa / debug */
+.o_main_navbar .o_navbar_apps_menu .o_dropdown_button,
+.o_main_navbar .o_navbar_debug_dropdown .o_dropdown_button {
+    color: var(--gm-text-light) !important;
+}
+
+/* Avatar usuario */
+.o_main_navbar .o_user_menu .o_dropdown_button {
+    color: var(--gm-text-light) !important;
+}
+
+/* ================================================================
+   MENÚ DE APLICACIONES (home grid)
+   ================================================================ */
+
+.o_home_menu .o_app:hover .o_app_icon {
+    border-color: var(--gm-orange) !important;
+}
+
+.o_home_menu .o_app.o_active .o_app_icon,
+.o_home_menu .o_app:focus .o_app_icon {
+    border: 2px solid var(--gm-orange) !important;
+}
+
+/* ================================================================
+   SIDEBAR / MENÚ LATERAL
+   ================================================================ */
+
+.o_action_manager .o_menu_sections,
+.o_web_client .o_main_content .o_action_manager {
+    --o-sidebar-bg: var(--gm-dark-mid);
+}
+
+/* ================================================================
+   BOTONES PRIMARIOS
+   ================================================================ */
+
+.btn-primary,
+.o_form_button_save,
+.o_statusbar_buttons .btn-primary {
+    background-color: var(--gm-orange) !important;
+    border-color: var(--gm-orange) !important;
+    color: var(--gm-white) !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active,
+.o_form_button_save:hover {
+    background-color: var(--gm-orange-dark) !important;
+    border-color: var(--gm-orange-dark) !important;
+}
+
+/* ================================================================
+   LINKS Y ACENTOS
+   ================================================================ */
+
+a, .o_form_uri {
+    color: var(--gm-orange) !important;
+}
+
+a:hover, .o_form_uri:hover {
+    color: var(--gm-orange-dark) !important;
+}
+
+/* ================================================================
+   KANBAN — header de columna activa
+   ================================================================ */
+
+.o_kanban_view .o_kanban_group.o_kanban_group_show .o_column_title {
+    color: var(--gm-orange) !important;
+}
+
+/* ================================================================
+   SELECCIÓN / CHECKBOX
+   ================================================================ */
+
+.o_field_boolean input:checked + span,
+.form-check-input:checked {
+    background-color: var(--gm-orange) !important;
+    border-color: var(--gm-orange) !important;
+}
+
+/* ================================================================
+   STATUS BAR — estado activo
+   ================================================================ */
+
+.o_statusbar_status button.o_arrow_button.active,
+.o_statusbar_status .o_arrow_button.btn-primary {
+    background: var(--gm-orange) !important;
+    border-color: var(--gm-orange-dark) !important;
+}
+
+/* ================================================================
+   BREADCRUMB
+   ================================================================ */
+
+.breadcrumb-item.active,
+.o_breadcrumb .o_breadcrumb_title {
+    color: var(--gm-orange) !important;
+    font-weight: 600;
+}
+
+/* ================================================================
+   ALERTAS / NOTIFICACIONES
+   ================================================================ */
+
+.o_notification.o_notification_success,
+.o_notification_bar.bg-success {
+    background: var(--gm-orange) !important;
+    border-left: 4px solid var(--gm-orange-dark) !important;
+}
+
+/* ================================================================
+   LOADING / SPINNER
+   ================================================================ */
+
+.o_loading_indicator .o_loading_indicator_spin {
+    border-top-color: var(--gm-orange) !important;
+}
+
+/* ================================================================
+   POS — barra superior coherente con branding
+   ================================================================ */
+
+.pos-topheader,
+.pos-top-header {
+    background-color: var(--gm-dark) !important;
+    border-bottom: 2px solid var(--gm-orange) !important;
+}
+
+.pos-topheader .pos-logo,
+.pos-top-header .pos-logo {
+    color: var(--gm-orange) !important;
+}
+
+/* ================================================================
+   FAVICON — se controla vía XML/Python, esto es solo referencia
+   ================================================================ */
