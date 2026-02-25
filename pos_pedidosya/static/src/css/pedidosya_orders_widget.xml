@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+    <!--
+        Botón flotante que se muestra en el FloorScreen (pantalla de mesas).
+        Muestra un badge con la cantidad de pedidos pendientes.
+        Pulsa visualmente cuando hay pedidos nuevos.
+    -->
+    <t t-name="pos_pedidosya.PedidosYaButton">
+        <button
+            class="pedidosya-floor-btn"
+            t-att-class="state.hasNew ? 'pedidosya-floor-btn--pulse' : ''"
+            t-on-click="openDialog"
+            title="Pedidos PedidosYa"
+        >
+            <span class="pedidosya-floor-btn__label">PedidosYa</span>
+            <span
+                t-if="state.pendingCount > 0"
+                class="pedidosya-floor-btn__badge"
+            >
+                <t t-esc="state.pendingCount"/>
+            </span>
+        </button>
+    </t>
+
+    <!--
+        Diálogo que lista los pedidos en estado 'received'.
+        Permite aceptar o rechazar cada pedido desde el POS.
+    -->
+    <t t-name="pos_pedidosya.PedidosYaOrdersDialog">
+        <div class="pedidosya-dialog-backdrop" t-on-click.self="close">
+            <div class="pedidosya-dialog">
+
+                <!-- Header -->
+                <div class="pedidosya-dialog__header">
+                    <h3 class="pedidosya-dialog__title">
+                        🛵 PedidosYa
+                        <span t-if="state.orders.length > 0" class="pedidosya-dialog__count">
+                            <t t-esc="state.orders.length"/> pendiente(s)
+                        </span>
+                    </h3>
+                    <button class="pedidosya-dialog__close" t-on-click="close">✕</button>
+                </div>
+
+                <!-- Cuerpo: sin pedidos -->
+                <div t-if="state.orders.length === 0" class="pedidosya-dialog__empty">
+                    <p>✅ No hay pedidos pendientes</p>
+                </div>
+
+                <!-- Cuerpo: lista de pedidos -->
+                <div t-else="" class="pedidosya-dialog__list">
+                    <div
+                        t-foreach="state.orders"
+                        t-as="order"
+                        t-key="order.id"
+                        class="pedidosya-order-card"
+                    >
+                        <div class="pedidosya-order-card__header">
+                            <span class="pedidosya-order-card__id">
+                                # <t t-esc="order.platform_order_id or order.pedidosya_order_id"/>
+                            </span>
+                            <span class="pedidosya-order-card__customer">
+                                👤 <t t-esc="order.customer_name or 'Sin nombre'"/>
+                            </span>
+                            <span class="pedidosya-order-card__total">
+                                $ <t t-esc="order.order_total"/>
+                            </span>
+                        </div>
+
+                        <div class="pedidosya-order-card__lines" t-if="order.lines and order.lines.length">
+                            <t t-foreach="order.lines" t-as="line" t-key="line.id">
+                                <div class="pedidosya-order-card__line">
+                                    <span class="line-qty"><t t-esc="line.quantity"/>x</span>
+                                    <span class="line-name"><t t-esc="line.product_name"/></span>
+                                    <span t-if="line.notes" class="line-notes">(<t t-esc="line.notes"/>)</span>
+                                </div>
+                            </t>
+                        </div>
+
+                        <div class="pedidosya-order-card__actions">
+                            <button
+                                class="pedidosya-btn pedidosya-btn--accept"
+                                t-on-click="() => this.acceptOrder(order.id)"
+                                t-att-disabled="state.loading[order.id]"
+                            >
+                                ✓ Aceptar
+                            </button>
+                            <button
+                                class="pedidosya-btn pedidosya-btn--reject"
+                                t-on-click="() => this.rejectOrder(order.id)"
+                                t-att-disabled="state.loading[order.id]"
+                            >
+                                ✗ Rechazar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="pedidosya-dialog__footer">
+                    <button class="pedidosya-btn pedidosya-btn--secondary" t-on-click="close">
+                        Cerrar
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </t>
+
+</templates>
