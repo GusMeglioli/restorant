@@ -1,51 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-<!-- ═══ Back office: pestaña Horarios en POS config ═══════════════════════ -->
+<!-- ═══ Back office: control apertura/cierre y horarios automáticos PedidosYa ═══ -->
 <record id="pos_config_view_form_pedidosya_schedule" model="ir.ui.view">
     <field name="name">pos.config.form.pedidosya.schedule</field>
     <field name="model">pos.config</field>
-    <field name="inherit_id" ref="pos_pedidosya.pos_config_view_form_pedidosya"/>
+    <field name="inherit_id" ref="pos_pedidosya.view_pos_config_form_pedidosya"/>
     <field name="arch" type="xml">
-        <xpath expr="//notebook" position="inside">
-            <page string="🕐 Horarios PedidosYa" name="pedidosya_schedule">
-                <group>
-                    <group string="Estado actual">
-                        <field name="pedidosya_is_open"/>
-                        <field name="pedidosya_manual_override" readonly="1"/>
-                        <field name="pedidosya_close_until" readonly="1"/>
-                    </group>
-                    <group string="Control manual">
-                        <div>
-                            <button
-                                name="action_pedidosya_open"
-                                type="object"
-                                string="🟢 Abrir ahora en PedidosYa"
-                                class="btn btn-success"
-                                invisible="pedidosya_is_open"/>
-                            <button
-                                name="action_pedidosya_toggle"
-                                type="object"
-                                string="🔴 Cerrar ahora en PedidosYa"
-                                class="btn btn-danger"
-                                invisible="not pedidosya_is_open"/>
-                        </div>
-                    </group>
-                </group>
-                <separator string="Horarios automáticos de apertura"/>
-                <p class="text-muted">
-                    El sistema abrirá y cerrará el local en PedidosYa automáticamente
-                    según estos horarios. El control manual tiene prioridad.
-                </p>
-                <field name="pedidosya_schedule_ids">
-                    <list editable="bottom">
-                        <field name="day_of_week"/>
-                        <field name="open_time" widget="float_time"/>
-                        <field name="close_time" widget="float_time"/>
-                        <field name="active"/>
-                    </list>
-                </field>
-            </page>
+        <xpath expr="//setting[@string='PedidosYa']/div[hasclass('content-group')]" position="inside">
+            <div invisible="not pedidosya_enabled">
+                <!-- Estado actual y control manual -->
+                <div class="row mb-3 mt-3">
+                    <div class="col-12">
+                        <strong>Estado en PedidosYa</strong>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <label for="pedidosya_is_open" class="col-lg-4 o_light_label"/>
+                    <field name="pedidosya_is_open" class="col-lg-8"/>
+                </div>
+                <div class="row mb-2">
+                    <label for="pedidosya_close_until" class="col-lg-4 o_light_label"/>
+                    <field name="pedidosya_close_until" readonly="1" class="col-lg-8"/>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-lg-8 offset-lg-4">
+                        <button
+                            name="action_pedidosya_open"
+                            type="object"
+                            string="Abrir ahora en PedidosYa"
+                            class="btn btn-success me-2"
+                            invisible="pedidosya_is_open"/>
+                        <button
+                            name="action_pedidosya_toggle"
+                            type="object"
+                            string="Cerrar ahora en PedidosYa"
+                            class="btn btn-danger"
+                            invisible="not pedidosya_is_open"/>
+                    </div>
+                </div>
+                <!-- Horarios automáticos -->
+                <div class="row mb-2">
+                    <div class="col-12">
+                        <strong>Horarios automáticos de apertura</strong>
+                        <span class="text-muted ms-2">El control manual tiene prioridad.</span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <field name="pedidosya_schedule_ids" nolabel="1">
+                            <list editable="bottom">
+                                <field name="day_of_week"/>
+                                <field name="open_time" widget="float_time"/>
+                                <field name="close_time" widget="float_time"/>
+                                <field name="active"/>
+                            </list>
+                        </field>
+                    </div>
+                </div>
+            </div>
         </xpath>
     </field>
 </record>
