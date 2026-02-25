@@ -1,0 +1,630 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!-- ═══════════════════════════════════════════════════════
+     PANTALLA DE COCINA
+     URL: /pedidosya/kitchen
+     Dispositivos: tablet, TV, celular
+══════════════════════════════════════════════════════════ -->
+<template id="kitchen_display" name="PedidosYa Kitchen Display">
+<![CDATA[
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>🍳 Cocina — PedidosYa</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #1a1a2e;
+    color: #eee;
+    min-height: 100vh;
+  }
+  header {
+    background: #ff6900;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+  header h1 { font-size: 1.4rem; font-weight: 700; }
+  header .clock { font-size: 1.2rem; font-weight: 600; }
+  #badge {
+    background: #fff;
+    color: #ff6900;
+    border-radius: 20px;
+    padding: 2px 12px;
+    font-weight: 800;
+    font-size: 1rem;
+    margin-left: 10px;
+  }
+  #grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+    padding: 16px;
+  }
+  .card {
+    background: #16213e;
+    border-radius: 12px;
+    border-left: 6px solid #ff6900;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    animation: slideIn 0.3s ease;
+  }
+  .card.preparing { border-left-color: #f0c040; }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .order-num {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #ff6900;
+  }
+  .customer {
+    font-size: 0.9rem;
+    color: #aaa;
+  }
+  .timer {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #f0c040;
+    background: rgba(240,192,64,0.1);
+    border-radius: 8px;
+    padding: 4px 10px;
+  }
+  .timer.urgent { color: #ff4444; background: rgba(255,68,68,0.15); }
+  .lines { list-style: none; }
+  .lines li {
+    padding: 6px 0;
+    border-bottom: 1px solid #ffffff10;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .lines li:last-child { border-bottom: none; }
+  .qty {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #ff6900;
+    min-width: 28px;
+    text-align: center;
+  }
+  .item-name { font-size: 1rem; flex: 1; }
+  .item-note {
+    font-size: 0.8rem;
+    color: #f0c040;
+    font-style: italic;
+    display: block;
+  }
+  .btn-ready {
+    background: #22c55e;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.2s, transform 0.1s;
+    margin-top: 4px;
+  }
+  .btn-ready:hover { background: #16a34a; }
+  .btn-ready:active { transform: scale(0.97); }
+  .btn-print {
+    background: transparent;
+    color: #aaa;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 8px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.2s;
+  }
+  .btn-print:hover { background: #ffffff15; color: #fff; }
+  #empty {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    color: #555;
+    font-size: 1.2rem;
+    gap: 12px;
+  }
+  #empty .icon { font-size: 4rem; }
+  #sound-btn {
+    background: transparent;
+    border: 1px solid #ffffff40;
+    color: #fff;
+    border-radius: 8px;
+    padding: 4px 12px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+</style>
+</head>
+<body>
+<header>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span>🍳 Cocina PedidosYa</span>
+    <span id="badge">0</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <button id="sound-btn" onclick="toggleSound()">🔔 Sonido ON</button>
+    <span class="clock" id="clock">--:--</span>
+  </div>
+</header>
+
+<div id="grid"></div>
+<div id="empty">
+  <span class="icon">✅</span>
+  <span>Sin pedidos pendientes en cocina</span>
+</div>
+
+<audio id="beep" preload="auto">
+  <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAA..." type="audio/wav"/>
+</audio>
+
+<script>
+const POLL_MS = 8000;
+let soundOn = true;
+let knownIds = new Set();
+let timers = {};
+
+function toggleSound() {
+  soundOn = !soundOn;
+  document.getElementById('sound-btn').textContent = soundOn ? '🔔 Sonido ON' : '🔕 Sonido OFF';
+}
+
+function playBeep() {
+  if (!soundOn) return;
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    for (let i = 0; i < 3; i++) {
+      setTimeout(() => {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.frequency.value = 880;
+        g.gain.setValueAtTime(0.3, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+        o.start(ctx.currentTime);
+        o.stop(ctx.currentTime + 0.3);
+      }, i * 400);
+    }
+  } catch(e) {}
+}
+
+function elapsed(dateStr) {
+  if (!dateStr) return '0m';
+  const diff = Math.floor((Date.now() - new Date(dateStr + 'Z').getTime()) / 60000);
+  if (diff < 60) return diff + 'm';
+  return Math.floor(diff/60) + 'h ' + (diff%60) + 'm';
+}
+
+function isUrgent(dateStr) {
+  if (!dateStr) return false;
+  return (Date.now() - new Date(dateStr + 'Z').getTime()) > 15 * 60000;
+}
+
+function printOrder(order) {
+  const w = window.open('', '_blank', 'width=400,height=600');
+  const lines = order.lines.map(l =>
+    `<tr><td style="font-size:1.4rem;font-weight:800;padding:4px 8px;">${l.quantity}x</td>
+     <td style="font-size:1.1rem;padding:4px 8px;">${l.product_name}${l.notes ? '<br><em style="color:#666;font-size:0.9rem;">'+l.notes+'</em>' : ''}</td></tr>`
+  ).join('');
+  w.document.write(`
+    <html><body style="font-family:monospace;padding:16px;">
+    <h2 style="text-align:center;">🛵 PEDIDO ${order.platform_order_id}</h2>
+    <p style="text-align:center;color:#666;">${order.customer_name}</p>
+    <hr/>
+    <table style="width:100%">${lines}</table>
+    <hr/>
+    <p style="text-align:center;font-size:0.9rem;">Total: $${order.order_total}</p>
+    <script>window.print();window.close();<\/script>
+    </body></html>
+  `);
+}
+
+async function markReady(orderId, btn) {
+  btn.disabled = true;
+  btn.textContent = '⏳ Procesando...';
+  try {
+    const r = await fetch('/pedidosya/kitchen/ready/' + orderId, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({jsonrpc:'2.0',method:'call',params:{}})
+    });
+    const d = await r.json();
+    if (d.result && d.result.status === 'ok') {
+      const card = document.getElementById('card-' + orderId);
+      if (card) {
+        card.style.transition = 'opacity 0.4s, transform 0.4s';
+        card.style.opacity = '0';
+        card.style.transform = 'scale(0.9)';
+        setTimeout(() => card.remove(), 400);
+      }
+    } else {
+      btn.disabled = false;
+      btn.textContent = '✅ LISTO — Retirar';
+    }
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = '✅ LISTO — Retirar';
+  }
+}
+
+async function fetchOrders() {
+  try {
+    const r = await fetch('/pedidosya/kitchen/orders', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({jsonrpc:'2.0',method:'call',params:{}})
+    });
+    const d = await r.json();
+    const orders = d.result || [];
+    const grid = document.getElementById('grid');
+    const empty = document.getElementById('empty');
+    const badge = document.getElementById('badge');
+
+    // Detectar nuevos pedidos
+    const newIds = new Set(orders.map(o => o.id));
+    let hasNew = false;
+    newIds.forEach(id => { if (!knownIds.has(id)) hasNew = true; });
+    if (hasNew && knownIds.size > 0) playBeep();
+    knownIds = newIds;
+
+    badge.textContent = orders.length;
+    document.title = orders.length > 0 ? `(${orders.length}) 🍳 Cocina` : '🍳 Cocina';
+
+    if (orders.length === 0) {
+      grid.innerHTML = '';
+      empty.style.display = 'flex';
+      return;
+    }
+    empty.style.display = 'none';
+
+    // Actualizar cards existentes o agregar nuevas
+    const existing = new Set([...grid.querySelectorAll('.card')].map(c => c.id));
+    orders.forEach(o => {
+      const cardId = 'card-' + o.id;
+      let card = document.getElementById(cardId);
+      if (!card) {
+        card = document.createElement('div');
+        card.className = 'card' + (o.state === 'preparing' ? ' preparing' : '');
+        card.id = cardId;
+        grid.appendChild(card);
+      }
+      const urgent = isUrgent(o.accepted_at);
+      const timerStr = elapsed(o.accepted_at);
+      const linesHtml = (o.lines || []).map(l => `
+        <li>
+          <span class="qty">${l.quantity}x</span>
+          <span class="item-name">${l.product_name}
+            ${l.notes ? '<span class="item-note">📝 ' + l.notes + '</span>' : ''}
+          </span>
+        </li>`).join('');
+      card.innerHTML = `
+        <div class="card-header">
+          <div>
+            <div class="order-num"># ${o.platform_order_id || o.id}</div>
+            <div class="customer">👤 ${o.customer_name || 'Cliente'}</div>
+          </div>
+          <div class="timer ${urgent ? 'urgent' : ''}">⏱ ${timerStr}</div>
+        </div>
+        <ul class="lines">${linesHtml}</ul>
+        <button class="btn-ready" onclick="markReady(${o.id}, this)">✅ LISTO — Retirar</button>
+        <button class="btn-print" onclick='printOrder(${JSON.stringify(o)})'>🖨️ Imprimir ticket</button>
+      `;
+    });
+
+    // Eliminar cards que ya no están
+    existing.forEach(id => {
+      if (!newIds.has(parseInt(id.replace('card-', '')))) {
+        const el = document.getElementById(id);
+        if (el) el.remove();
+      }
+    });
+  } catch(e) {
+    console.error('Kitchen fetch error:', e);
+  }
+}
+
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    now.toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+}
+
+fetchOrders();
+setInterval(fetchOrders, POLL_MS);
+setInterval(updateClock, 1000);
+updateClock();
+</script>
+</body>
+</html>
+]]>
+</template>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     PANTALLA LISTO PARA RETIRAR (mozo / rider)
+     URL: /pedidosya/ready
+══════════════════════════════════════════════════════════ -->
+<template id="ready_display" name="PedidosYa Ready Display">
+<![CDATA[
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>🛵 Listo para retirar — PedidosYa</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #0d1b0d;
+    color: #eee;
+    min-height: 100vh;
+  }
+  header {
+    background: #22c55e;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+  header h1 { font-size: 1.4rem; font-weight: 700; color: #fff; }
+  #badge {
+    background: #fff;
+    color: #22c55e;
+    border-radius: 20px;
+    padding: 2px 12px;
+    font-weight: 800;
+    font-size: 1rem;
+    margin-left: 10px;
+  }
+  #grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    padding: 16px;
+  }
+  .card {
+    background: #1a2e1a;
+    border-radius: 12px;
+    border-left: 6px solid #22c55e;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    animation: pop 0.4s ease;
+  }
+  @keyframes pop {
+    from { opacity: 0; transform: scale(0.95); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  .order-num { font-size: 2rem; font-weight: 800; color: #22c55e; }
+  .customer  { font-size: 1rem; color: #aaa; }
+  .lines { list-style: none; }
+  .lines li {
+    padding: 5px 0;
+    border-bottom: 1px solid #ffffff10;
+    display: flex; gap: 8px;
+  }
+  .qty { font-weight: 800; color: #22c55e; min-width: 28px; }
+  .btn-dispatched {
+    background: #ff6900;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.2s;
+    margin-top: 4px;
+  }
+  .btn-dispatched:hover { background: #e05500; }
+  #empty {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    color: #555;
+    font-size: 1.2rem;
+    gap: 12px;
+  }
+  .ready-badge {
+    background: #22c55e;
+    color: #fff;
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    align-self: flex-start;
+  }
+  #sound-btn {
+    background: transparent;
+    border: 1px solid #ffffff40;
+    color: #fff;
+    border-radius: 8px;
+    padding: 4px 12px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  .clock { font-size: 1.2rem; font-weight: 600; color: #fff; }
+</style>
+</head>
+<body>
+<header>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <h1>🛵 Listo para retirar</h1>
+    <span id="badge">0</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <button id="sound-btn" onclick="toggleSound()">🔔 ON</button>
+    <span class="clock" id="clock">--:--</span>
+  </div>
+</header>
+
+<div id="grid"></div>
+<div id="empty">
+  <span style="font-size:3rem;">🏍️</span>
+  <span>Sin pedidos listos para retirar</span>
+</div>
+
+<script>
+const POLL_MS = 6000;
+let soundOn = true;
+let knownIds = new Set();
+
+function toggleSound() {
+  soundOn = !soundOn;
+  document.getElementById('sound-btn').textContent = soundOn ? '🔔 ON' : '🔕 OFF';
+}
+
+function playAlert() {
+  if (!soundOn) return;
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [523, 659, 784].forEach((freq, i) => {
+      setTimeout(() => {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.frequency.value = freq;
+        g.gain.setValueAtTime(0.4, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+        o.start(ctx.currentTime);
+        o.stop(ctx.currentTime + 0.4);
+      }, i * 300);
+    });
+  } catch(e) {}
+}
+
+async function markDispatched(orderId, btn) {
+  btn.disabled = true;
+  btn.textContent = '⏳...';
+  try {
+    const r = await fetch('/pedidosya/ready/dispatched/' + orderId, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({jsonrpc:'2.0',method:'call',params:{}})
+    });
+    const d = await r.json();
+    if (d.result && d.result.status === 'ok') {
+      const card = document.getElementById('card-' + orderId);
+      if (card) {
+        card.style.transition = 'opacity 0.4s';
+        card.style.opacity = '0';
+        setTimeout(() => card.remove(), 400);
+      }
+    } else {
+      btn.disabled = false;
+      btn.textContent = '🏍️ Entregado al rider';
+    }
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = '🏍️ Entregado al rider';
+  }
+}
+
+async function fetchOrders() {
+  try {
+    const r = await fetch('/pedidosya/ready/orders', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({jsonrpc:'2.0',method:'call',params:{}})
+    });
+    const d = await r.json();
+    const orders = d.result || [];
+    const grid = document.getElementById('grid');
+    const empty = document.getElementById('empty');
+    const badge = document.getElementById('badge');
+
+    const newIds = new Set(orders.map(o => o.id));
+    let hasNew = false;
+    newIds.forEach(id => { if (!knownIds.has(id)) hasNew = true; });
+    if (hasNew && knownIds.size > 0) playAlert();
+    knownIds = newIds;
+
+    badge.textContent = orders.length;
+    document.title = orders.length > 0 ? `(${orders.length}) 🛵 Listo` : '🛵 Listo para retirar';
+
+    if (orders.length === 0) {
+      grid.innerHTML = '';
+      empty.style.display = 'flex';
+      return;
+    }
+    empty.style.display = 'none';
+
+    const existing = new Set([...grid.querySelectorAll('.card')].map(c => c.id));
+    orders.forEach(o => {
+      const cardId = 'card-' + o.id;
+      if (document.getElementById(cardId)) return;
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.id = cardId;
+      const linesHtml = (o.lines || []).map(l =>
+        `<li><span class="qty">${l.quantity}x</span><span>${l.product_name}</span></li>`
+      ).join('');
+      card.innerHTML = `
+        <span class="ready-badge">✅ LISTO</span>
+        <div class="order-num"># ${o.platform_order_id || o.id}</div>
+        <div class="customer">👤 ${o.customer_name || 'Cliente'}</div>
+        <ul class="lines">${linesHtml}</ul>
+        <button class="btn-dispatched" onclick="markDispatched(${o.id}, this)">🏍️ Entregado al rider</button>
+      `;
+      grid.appendChild(card);
+    });
+
+    existing.forEach(id => {
+      if (!newIds.has(parseInt(id.replace('card-', '')))) {
+        const el = document.getElementById(id);
+        if (el) el.remove();
+      }
+    });
+  } catch(e) {
+    console.error('Ready fetch error:', e);
+  }
+}
+
+function updateClock() {
+  document.getElementById('clock').textContent =
+    new Date().toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+}
+
+fetchOrders();
+setInterval(fetchOrders, POLL_MS);
+setInterval(updateClock, 1000);
+updateClock();
+</script>
+</body>
+</html>
+]]>
+</template>
+
+</odoo>
