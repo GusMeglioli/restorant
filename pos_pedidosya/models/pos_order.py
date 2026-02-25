@@ -126,7 +126,7 @@ class PosOrder(models.Model):
             'partner_id': False,
             'is_pedidosya': True,
             'lines': order_lines,
-            'note': f"PedidosYa Order #{order_data.get('displayId', order_id)}",
+            'internal_note': f"PedidosYa Order #{order_data.get('displayId', order_id)}",
         }
 
         pos_order = self.create(pos_order_vals)
