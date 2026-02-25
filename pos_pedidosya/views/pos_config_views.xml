@@ -6,11 +6,14 @@
         <field name="inherit_id" ref="point_of_sale.pos_config_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//setting[@id='other_devices']" position="after">
-                <setting string="PedidosYa"
+                <setting id="pedidosya_main_setting"
+                         string="PedidosYa"
                          help="Recibí pedidos online de PedidosYa directo en tu POS">
                     <field name="pedidosya_enabled" widget="boolean_toggle"/>
                     <div class="content-group mt16"
                          invisible="not pedidosya_enabled">
+
+                        <!-- ── Credenciales ── -->
                         <div class="row mb-2">
                             <label for="pedidosya_vendor_id"
                                    class="col-lg-4 o_light_label"/>
@@ -55,6 +58,61 @@
                             <field name="pedidosya_middleware_url"
                                    class="col-lg-8"/>
                         </div>
+
+                        <!-- ── Estado y control manual ── -->
+                        <div class="row mt-3 mb-1">
+                            <div class="col-12">
+                                <strong>Estado en PedidosYa</strong>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <label for="pedidosya_is_open"
+                                   class="col-lg-4 o_light_label"/>
+                            <field name="pedidosya_is_open" class="col-lg-8"/>
+                        </div>
+                        <div class="row mb-2">
+                            <label for="pedidosya_close_until"
+                                   class="col-lg-4 o_light_label"/>
+                            <field name="pedidosya_close_until"
+                                   readonly="1" class="col-lg-8"/>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-lg-8 offset-lg-4">
+                                <button
+                                    name="action_pedidosya_open"
+                                    type="object"
+                                    string="Abrir ahora en PedidosYa"
+                                    class="btn btn-success me-2"
+                                    invisible="pedidosya_is_open"/>
+                                <button
+                                    name="action_pedidosya_toggle"
+                                    type="object"
+                                    string="Cerrar ahora en PedidosYa"
+                                    class="btn btn-danger"
+                                    invisible="not pedidosya_is_open"/>
+                            </div>
+                        </div>
+
+                        <!-- ── Horarios automáticos ── -->
+                        <div class="row mb-2">
+                            <div class="col-12">
+                                <strong>Horarios automáticos de apertura</strong>
+                                <span class="text-muted ms-2">El control manual tiene prioridad.</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <field name="pedidosya_schedule_ids" nolabel="1">
+                                    <list editable="bottom">
+                                        <field name="day_of_week"/>
+                                        <field name="open_time" widget="float_time"/>
+                                        <field name="close_time" widget="float_time"/>
+                                        <field name="active"/>
+                                    </list>
+                                </field>
+                            </div>
+                        </div>
+
                     </div>
                 </setting>
             </xpath>
