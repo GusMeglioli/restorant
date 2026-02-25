@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- ── Logo y Favicon de empresa ───────────────────────────────────── -->
+    <record id="base.main_company" model="res.company">
+        <field name="logo" type="base64" file="gm_branding/static/src/img/gm_logo.png"/>
+        <field name="favicon" type="base64" file="gm_branding/static/src/img/gm_favicon.png"/>
+    </record>
+
     <!-- ── Color primario de UI (tema Odoo Enterprise) ──────────────────── -->
     <record id="primary_color_param" model="ir.config_parameter">
         <field name="key">web.primary_color</field>
