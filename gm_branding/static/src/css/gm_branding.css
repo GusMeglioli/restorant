@@ -1,270 +1,160 @@
 /* ================================================================
-   GM Multiservicios — Branding Corporativo
-   Primario: #ff5d00 | Oscuro: #202020
+   GM Multiservicios — Branding Corporativo Odoo 19
+   Naranja: #ff5d00 | Oscuro: #202020 | Blanco hueso: #f5f5f5
    ================================================================ */
 
-/* ── Variables globales ─────────────────────────────────────────── */
-:root {
-    --gm-orange:       #ff5d00;
-    --gm-orange-dark:  #d94e00;
-    --gm-orange-light: #ff7a2e;
-    --gm-dark:         #202020;
-    --gm-dark-mid:     #2e2e2e;
-    --gm-dark-soft:    #3a3a3a;
-    --gm-white:        #f5f5f5;
-    --gm-white-pure:   #ffffff;
-    --gm-text-light:   #f5f5f5;
+/* ── Sobreescribir variables de color de Odoo 19 ────────────────── */
+:root,
+.o_web_client {
+    /* Color primario del sistema */
+    --o-color-1:             #ff5d00;
+    --primary:               #ff5d00;
+    --bs-primary:            #ff5d00;
+    --bs-primary-rgb:        255, 93, 0;
+    --bs-link-color:         #ff5d00;
+    --bs-link-hover-color:   #d94e00;
+
+    /* Botones primarios (sistema de color cards Odoo) */
+    --o-cc1-btn-primary:        #ff5d00;
+    --o-cc1-btn-primary-text:   #ffffff;
+    --o-cc1-btn-primary-border: #d94e00;
+
+    /* Fondo general */
+    --o-view-background-color: #f5f5f5;
 }
 
-/* ================================================================
-   FONDO GENERAL DE CONTENIDO
-   ================================================================ */
+/* ── NAVBAR / HEADER SUPERIOR ───────────────────────────────────── */
 
-/* Fondo principal de la app */
-.o_web_client,
-.o_action_manager,
-.o_content {
-    background-color: var(--gm-white) !important;
+.o_main_navbar {
+    background-color: #202020 !important;
+    border-bottom: 2px solid #ff5d00 !important;
 }
 
-/* Vistas formulario */
-.o_form_view,
-.o_form_sheet_bg {
-    background-color: var(--gm-white) !important;
+.o_main_navbar * {
+    color: #f5f5f5 !important;
 }
 
-/* Vistas lista */
-.o_list_view {
-    background-color: var(--gm-white) !important;
-}
-
-/* Kanban fondo */
-.o_kanban_view {
-    background-color: var(--gm-white) !important;
-}
-
-/* Sidebar / chatter */
-.o_form_sheet,
-.o_chatter {
-    background-color: var(--gm-white-pure) !important;
-}
-
-/* Menú lateral (si aplica) */
-.o_action_manager .o_menu_panel {
-    background-color: var(--gm-dark-mid) !important;
-    color: var(--gm-white) !important;
-}
-
-/* ================================================================
-   TEXTO SOBRE FONDOS OSCUROS — garantiza legibilidad
-   ================================================================ */
-
-.o_main_navbar .o_menu_brand,
-.o_main_navbar .o_nav_entry,
-.o_main_navbar .o_menu_sections > li > a {
-    color: var(--gm-white) !important;
-}
-
-/* Texto sobre botones primarios */
-.btn-primary,
-.o_form_button_save {
-    color: var(--gm-white-pure) !important;
-}
-
-/* ================================================================
-   INPUTS Y CAMPOS — fondo blanco hueso
-   ================================================================ */
-
-.o_field_widget input,
-.o_field_widget textarea,
-.o_field_widget select,
-.o_form_view .o_field_widget .o_input {
-    background-color: var(--gm-white-pure) !important;
-    border-color: #ddd !important;
-}
-
-.o_field_widget input:focus,
-.o_field_widget textarea:focus,
-.o_form_view .o_field_widget .o_input:focus {
-    border-color: var(--gm-orange) !important;
-    box-shadow: 0 0 0 2px rgba(255, 93, 0, 0.18) !important;
-    outline: none !important;
-}
-
-/* ================================================================
-   NAVBAR / HEADER SUPERIOR
-   ================================================================ */
-
-.o_main_navbar,
-.o_navbar {
-    background-color: var(--gm-dark) !important;
-    border-bottom: 2px solid var(--gm-orange) !important;
-}
-
-/* Logo en navbar */
-.o_main_navbar .o_menu_brand,
-.o_main_navbar .o_menu_brand:hover {
-    color: var(--gm-orange) !important;
+.o_main_navbar .o_menu_brand {
+    color: #ff5d00 !important;
     font-weight: 700 !important;
 }
 
-/* Íconos y links del navbar */
-.o_main_navbar .o_nav_entry,
-.o_main_navbar .o_nav_entry:hover,
-.o_main_navbar .o_menu_sections > li > a,
-.o_main_navbar .o_menu_sections > li > a:hover {
-    color: var(--gm-text-light) !important;
-}
-
-.o_main_navbar .o_nav_entry:hover,
-.o_main_navbar .o_menu_sections > li > a:hover {
-    color: var(--gm-orange) !important;
-    background: rgba(255, 93, 0, 0.12) !important;
-}
-
-/* Menú de apps activo */
+/* Menú activo en navbar */
+.o_main_navbar .o_menu_sections .o_nav_entry.active,
 .o_main_navbar .o_menu_sections > li.active > a,
-.o_main_navbar .o_menu_sections > li.o_active > a {
-    color: var(--gm-orange) !important;
-    border-bottom: 2px solid var(--gm-orange) !important;
+.o_main_navbar .o_dropdown.o_nav_entry:focus {
+    color: #ff5d00 !important;
+    background: rgba(255, 93, 0, 0.15) !important;
 }
 
-/* Botón hamburguesa / debug */
-.o_main_navbar .o_navbar_apps_menu .o_dropdown_button,
-.o_main_navbar .o_navbar_debug_dropdown .o_dropdown_button {
-    color: var(--gm-text-light) !important;
+/* Hover en navbar */
+.o_main_navbar .o_nav_entry:hover,
+.o_main_navbar .o_menu_sections > li > a:hover {
+    color: #ff5d00 !important;
+    background: rgba(255, 93, 0, 0.1) !important;
 }
 
-/* Avatar usuario */
-.o_main_navbar .o_user_menu .o_dropdown_button {
-    color: var(--gm-text-light) !important;
-}
-
-/* ================================================================
-   MENÚ DE APLICACIONES (home grid)
-   ================================================================ */
-
-.o_home_menu .o_app:hover .o_app_icon {
-    border-color: var(--gm-orange) !important;
-}
-
-.o_home_menu .o_app.o_active .o_app_icon,
-.o_home_menu .o_app:focus .o_app_icon {
-    border: 2px solid var(--gm-orange) !important;
-}
-
-/* ================================================================
-   SIDEBAR / MENÚ LATERAL
-   ================================================================ */
-
-.o_action_manager .o_menu_sections,
-.o_web_client .o_main_content .o_action_manager {
-    --o-sidebar-bg: var(--gm-dark-mid);
-}
-
-/* ================================================================
-   BOTONES PRIMARIOS
-   ================================================================ */
+/* ── BOTONES PRIMARIOS ──────────────────────────────────────────── */
 
 .btn-primary,
-.o_form_button_save,
-.o_statusbar_buttons .btn-primary {
-    background-color: var(--gm-orange) !important;
-    border-color: var(--gm-orange) !important;
-    color: var(--gm-white) !important;
+.btn-primary.disabled,
+.btn-primary:disabled {
+    background-color: #ff5d00 !important;
+    border-color: #d94e00 !important;
+    color: #ffffff !important;
 }
 
 .btn-primary:hover,
 .btn-primary:focus,
 .btn-primary:active,
-.o_form_button_save:hover {
-    background-color: var(--gm-orange-dark) !important;
-    border-color: var(--gm-orange-dark) !important;
+.btn-primary.active,
+.show > .btn-primary.dropdown-toggle {
+    background-color: #d94e00 !important;
+    border-color: #b84200 !important;
+    color: #ffffff !important;
 }
 
-/* ================================================================
-   LINKS Y ACENTOS
-   ================================================================ */
+/* ── FONDO GENERAL DEL BACKEND ──────────────────────────────────── */
 
-a, .o_form_uri {
-    color: var(--gm-orange) !important;
+.o_web_client,
+.o_action_manager {
+    background-color: #f5f5f5 !important;
 }
 
-a:hover, .o_form_uri:hover {
-    color: var(--gm-orange-dark) !important;
+.o_view_controller,
+.o_form_view,
+.o_list_view,
+.o_kanban_view {
+    background-color: #f5f5f5 !important;
 }
 
-/* ================================================================
-   KANBAN — header de columna activa
-   ================================================================ */
+/* ── LINKS ──────────────────────────────────────────────────────── */
 
-.o_kanban_view .o_kanban_group.o_kanban_group_show .o_column_title {
-    color: var(--gm-orange) !important;
+a:not(.btn):not(.nav-link) {
+    color: #ff5d00 !important;
 }
 
-/* ================================================================
-   SELECCIÓN / CHECKBOX
-   ================================================================ */
-
-.o_field_boolean input:checked + span,
-.form-check-input:checked {
-    background-color: var(--gm-orange) !important;
-    border-color: var(--gm-orange) !important;
+a:not(.btn):not(.nav-link):hover {
+    color: #d94e00 !important;
 }
 
-/* ================================================================
-   STATUS BAR — estado activo
-   ================================================================ */
-
-.o_statusbar_status button.o_arrow_button.active,
-.o_statusbar_status .o_arrow_button.btn-primary {
-    background: var(--gm-orange) !important;
-    border-color: var(--gm-orange-dark) !important;
+.o_form_uri {
+    color: #ff5d00 !important;
 }
 
-/* ================================================================
-   BREADCRUMB
-   ================================================================ */
+/* ── STATUS BAR ─────────────────────────────────────────────────── */
 
-.breadcrumb-item.active,
-.o_breadcrumb .o_breadcrumb_title {
-    color: var(--gm-orange) !important;
-    font-weight: 600;
+.o_statusbar_status .btn.o_arrow_button.active,
+.o_statusbar_status .btn.o_arrow_button[aria-checked="true"] {
+    background: #ff5d00 !important;
+    border-color: #d94e00 !important;
+    color: #ffffff !important;
 }
 
-/* ================================================================
-   ALERTAS / NOTIFICACIONES
-   ================================================================ */
+/* ── INPUTS — borde naranja al enfocar ──────────────────────────── */
 
-.o_notification.o_notification_success,
-.o_notification_bar.bg-success {
-    background: var(--gm-orange) !important;
-    border-left: 4px solid var(--gm-orange-dark) !important;
+.o_input:focus,
+input.o_input:focus,
+textarea.o_input:focus,
+.o_field_widget input:focus,
+.o_field_widget textarea:focus {
+    border-color: #ff5d00 !important;
+    box-shadow: 0 0 0 2px rgba(255, 93, 0, 0.2) !important;
+    outline: none !important;
 }
 
-/* ================================================================
-   LOADING / SPINNER
-   ================================================================ */
+/* ── CHECKBOXES Y TOGGLES ───────────────────────────────────────── */
 
-.o_loading_indicator .o_loading_indicator_spin {
-    border-top-color: var(--gm-orange) !important;
+.form-check-input:checked,
+.o_toggle input:checked + .o_toggle_button {
+    background-color: #ff5d00 !important;
+    border-color: #d94e00 !important;
 }
 
-/* ================================================================
-   POS — barra superior coherente con branding
-   ================================================================ */
+/* ── BREADCRUMB activo ──────────────────────────────────────────── */
+
+.o_breadcrumb .o_breadcrumb_title,
+.breadcrumb-item.active {
+    color: #ff5d00 !important;
+}
+
+/* ── SELECCIÓN en listas ────────────────────────────────────────── */
+
+.o_list_view .o_data_row.o_row_handle:hover,
+.o_list_view tbody tr:hover {
+    background: rgba(255, 93, 0, 0.06) !important;
+}
+
+/* ── POS — coherencia con el backend ───────────────────────────── */
 
 .pos-topheader,
 .pos-top-header {
-    background-color: var(--gm-dark) !important;
-    border-bottom: 2px solid var(--gm-orange) !important;
+    background-color: #202020 !important;
+    border-bottom: 2px solid #ff5d00 !important;
 }
 
-.pos-topheader .pos-logo,
-.pos-top-header .pos-logo {
-    color: var(--gm-orange) !important;
-}
+/* ── SPINNER / LOADING ──────────────────────────────────────────── */
 
-/* ================================================================
-   FAVICON — se controla vía XML/Python, esto es solo referencia
-   ================================================================ */
+.o_loading_indicator .o_loading_indicator_spin {
+    border-top-color: #ff5d00 !important;
+}
