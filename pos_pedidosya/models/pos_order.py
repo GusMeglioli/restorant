@@ -104,10 +104,9 @@ class PosOrder(models.Model):
         address_str = self._format_delivery_address(delivery_address)
 
         # Construir líneas de pedido
-        order_lines = self._build_order_lines(
-            order_data.get('products', []),
-            pos_session,
-        )
+        # Soportar tanto 'products' (spec PedidosYa) como 'items' (payload simplificado)
+        raw_products = order_data.get('products') or order_data.get('items', [])
+        order_lines = self._build_order_lines(raw_products, pos_session)
 
         if not order_lines:
             _logger.error('PedidosYa order %s: no valid products found.', order_id)
@@ -161,10 +160,12 @@ class PosOrder(models.Model):
         })
 
         pos_order.write({'pedidosya_order_id': pedidosya_order.id})
-        
-        # ── Crear líneas en pedidosya.order.line ──────────────────
-        for product_data in order_data.get('products', []):
-            remote_code = str(product_data.get('id', ''))
+
+        # ── Crear líneas en pedidosya.order.line ─────────────────────────
+        for product_data in raw_products:
+            remote_code = str(
+                product_data.get('remoteCode') or product_data.get('id', '')
+            )
             product = self.env['product.product'].search([
                 ('default_code', '=', remote_code),
                 ('available_in_pos', '=', True),
@@ -178,8 +179,8 @@ class PosOrder(models.Model):
                 'unit_price': float(product_data.get('unitPrice', 0.0)),
                 'notes': product_data.get('comment', ''),
             })
-        # ────────────────────────────────────────────────────────────────
-        
+        # ─────────────────────────────────────────────────────────────────
+
         _logger.info(
             'PedidosYa order %s created as POS order %s.',
             order_id,
@@ -203,10 +204,14 @@ class PosOrder(models.Model):
         """
         Convert PedidosYa product list to Odoo POS order lines format.
         Matches products by internal reference (default_code) = remoteCode.
+        Soporta tanto el campo 'remoteCode' como 'id' para el código del producto.
         """
         lines = []
         for product_data in products:
-            remote_code = str(product_data.get('id', ''))
+            # remoteCode es el campo oficial de PedidosYa; 'id' como fallback
+            remote_code = str(
+                product_data.get('remoteCode') or product_data.get('id', '')
+            )
             product = self.env['product.product'].search([
                 ('default_code', '=', remote_code),
                 ('available_in_pos', '=', True),
