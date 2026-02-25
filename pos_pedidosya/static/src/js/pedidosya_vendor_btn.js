@@ -142,14 +142,10 @@ function injectVendorStyles() {
     style.id = 'pya-vendor-styles';
     style.textContent = `
         .pya-vendor-btn {
-            position: fixed;
-            top: 14px;
-            right: 170px;
-            z-index: 9998;
             border: none;
             border-radius: 20px;
-            padding: 8px 16px;
-            font-size: 0.88rem;
+            padding: 7px 14px;
+            font-size: 14px;
             font-weight: 700;
             cursor: pointer;
             display: flex;
@@ -158,6 +154,8 @@ function injectVendorStyles() {
             box-shadow: 0 2px 8px rgba(0,0,0,0.25);
             transition: opacity 0.2s, transform 0.1s;
             font-family: inherit;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
         .pya-vendor-btn:hover { opacity: 0.88; transform: scale(1.03); }
         .pya-vendor-open  { background: #22c55e; color: #fff; }
@@ -237,7 +235,16 @@ function injectVendorButton() {
         const status = await checkVendorStatus();
         if (status) renderVendorDialog(status);
     });
-    document.body.appendChild(btn);
+    // Inyectar en el grupo de la barra de pisos (junto al botón de pedidos)
+    let group = document.getElementById('pya-toolbar-group');
+    if (!group) {
+        const floorBar = document.querySelector('.d-flex.flex-row.justify-content-between.border-bottom');
+        if (!floorBar) { document.body.appendChild(btn); return; }
+        group = document.createElement('div');
+        group.id = 'pya-toolbar-group';
+        floorBar.appendChild(group);
+    }
+    group.appendChild(btn);
 
     // Polling
     if (vendorTimer) clearInterval(vendorTimer);
@@ -251,10 +258,10 @@ function injectVendorButton() {
 function startVendorObserver() {
     if (!document.body) { setTimeout(startVendorObserver, 50); return; }
     const observer = new MutationObserver(() => {
-        const posReady = document.querySelector('.floor-screen, .pos-content, .pos-topleft-buttons');
-        if (posReady && document.getElementById('pya-floor-btn')) {
+        const floorBar = document.querySelector('.d-flex.flex-row.justify-content-between.border-bottom');
+        if (floorBar) {
             observer.disconnect();
-            setTimeout(injectVendorButton, 300);
+            setTimeout(injectVendorButton, 400);
         }
     });
     observer.observe(document.body, { childList: true, subtree: true });

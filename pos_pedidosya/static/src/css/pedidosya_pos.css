@@ -2,31 +2,38 @@
    PedidosYa POS Styles - HTML/JS puro
    ================================================================ */
 
-/* ── Botón flotante ──────────────────────────────────────────────── */
+/* ── Contenedor de botones PedidosYa en la barra de pisos ───────── */
 
-#pya-floor-btn {
-    position: fixed;
-    top: 16px;
-    right: 80px;
-    z-index: 9000;
+#pya-toolbar-group {
     display: flex;
     align-items: center;
     gap: 8px;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+/* ── Botón de pedidos ────────────────────────────────────────────── */
+
+#pya-floor-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     background: #ff6b35;
     color: #fff;
     border: none;
-    border-radius: 24px;
-    padding: 10px 18px;
-    font-size: 15px;
+    border-radius: 20px;
+    padding: 7px 14px;
+    font-size: 14px;
     font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+    box-shadow: 0 2px 8px rgba(255, 107, 53, 0.4);
     transition: transform 0.15s, box-shadow 0.15s;
+    white-space: nowrap;
 }
 
 #pya-floor-btn:hover {
     transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(255, 107, 53, 0.55);
+    box-shadow: 0 4px 14px rgba(255, 107, 53, 0.55);
 }
 
 #pya-floor-btn:active { transform: scale(0.97); }
@@ -37,7 +44,7 @@
 
 @keyframes pya-pulse {
     0%   { box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.7); }
-    70%  { box-shadow: 0 0 0 12px rgba(255, 107, 53, 0); }
+    70%  { box-shadow: 0 0 0 10px rgba(255, 107, 53, 0); }
     100% { box-shadow: 0 0 0 0 rgba(255, 107, 53, 0); }
 }
 

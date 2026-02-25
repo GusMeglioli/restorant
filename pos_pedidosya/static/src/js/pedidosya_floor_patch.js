@@ -225,22 +225,35 @@ async function checkOrders() {
 function injectButton() {
     if (document.getElementById("pya-floor-btn")) return; // Ya existe
 
+    // Buscar la barra de pisos (Main Floor / Patio)
+    const floorBar = document.querySelector(".d-flex.flex-row.justify-content-between.border-bottom");
+    if (!floorBar) return;
+
+    // Crear grupo de botones PedidosYa si no existe
+    let group = document.getElementById("pya-toolbar-group");
+    if (!group) {
+        group = document.createElement("div");
+        group.id = "pya-toolbar-group";
+        floorBar.appendChild(group);
+    }
+
     const btn = document.createElement("button");
     btn.id = "pya-floor-btn";
-    btn.innerHTML = `🛵 PedidosYa <span class="pya-badge" style="display:none">0</span>`;
+    btn.innerHTML = `🛵 Pedidos <span class="pya-badge" style="display:none">0</span>`;
     btn.addEventListener("click", async () => {
         const orders = await fetchOrders();
         renderDialog(orders);
     });
-    document.body.appendChild(btn);
+    group.insertBefore(btn, group.firstChild);
 
     // Iniciar polling
     if (pollingTimer) clearInterval(pollingTimer);
     checkOrders();
     pollingTimer = setInterval(checkOrders, POLL_INTERVAL);
 
-    console.log("PedidosYa: botón inyectado correctamente");
+    console.log("PedidosYa: botón inyectado en barra de pisos");
 }
+
 
 // ── Punto de entrada ───────────────────────────────────────────────────────
 
@@ -251,10 +264,10 @@ function startObserver() {
         return;
     }
     const observer = new MutationObserver(() => {
-        const posReady = document.querySelector(".floor-screen, .pos-content, .pos-topleft-buttons");
-        if (posReady) {
+        const floorBar = document.querySelector(".d-flex.flex-row.justify-content-between.border-bottom");
+        if (floorBar) {
             observer.disconnect();
-            setTimeout(injectButton, 500);
+            setTimeout(injectButton, 300);
         }
     });
     observer.observe(document.body, { childList: true, subtree: true });
