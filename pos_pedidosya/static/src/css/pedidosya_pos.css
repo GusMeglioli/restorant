@@ -1,15 +1,14 @@
 /* ================================================================
-   PedidosYa POS Frontend Styles
-   Compatible con Odoo 19 POS (modo oscuro de restaurante)
+   PedidosYa POS Styles - HTML/JS puro
    ================================================================ */
 
-/* ── Botón flotante en el floor screen ──────────────────────────── */
+/* ── Botón flotante ──────────────────────────────────────────────── */
 
-.pedidosya-floor-btn {
+#pya-floor-btn {
     position: fixed;
     top: 16px;
     right: 80px;
-    z-index: 1000;
+    z-index: 9000;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -25,59 +24,52 @@
     transition: transform 0.15s, box-shadow 0.15s;
 }
 
-.pedidosya-floor-btn:hover {
+#pya-floor-btn:hover {
     transform: scale(1.05);
     box-shadow: 0 6px 16px rgba(255, 107, 53, 0.55);
 }
 
-.pedidosya-floor-btn:active {
-    transform: scale(0.97);
+#pya-floor-btn:active { transform: scale(0.97); }
+
+#pya-floor-btn.pya-pulse {
+    animation: pya-pulse 1s ease-in-out infinite;
 }
 
-/* Animación de pulso cuando hay pedidos nuevos */
-.pedidosya-floor-btn--pulse {
-    animation: pedidosya-pulse 1s ease-in-out infinite;
-}
-
-@keyframes pedidosya-pulse {
+@keyframes pya-pulse {
     0%   { box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.7); }
     70%  { box-shadow: 0 0 0 12px rgba(255, 107, 53, 0); }
     100% { box-shadow: 0 0 0 0 rgba(255, 107, 53, 0); }
 }
 
-/* Badge con contador */
-.pedidosya-floor-btn__badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+.pya-badge {
     background: #fff;
     color: #ff6b35;
     border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    font-size: 13px;
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
     font-weight: 900;
-    line-height: 1;
-    margin-left: 2px;
 }
 
+/* ── Backdrop ────────────────────────────────────────────────────── */
 
-/* ── Backdrop del diálogo ────────────────────────────────────────── */
-
-.pedidosya-dialog-backdrop {
+.pya-backdrop {
     position: fixed;
     inset: 0;
-    z-index: 9999;
-    background: rgba(0, 0, 0, 0.65);
+    z-index: 10000;
+    background: rgba(0,0,0,0.65);
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 16px;
 }
 
-/* ── Diálogo principal ───────────────────────────────────────────── */
+/* ── Modal ───────────────────────────────────────────────────────── */
 
-.pedidosya-dialog {
+.pya-modal {
     background: #1e1e2e;
     color: #e0e0e0;
     border-radius: 16px;
@@ -86,12 +78,11 @@
     max-height: 85vh;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
     overflow: hidden;
 }
 
-/* Header */
-.pedidosya-dialog__header {
+.pya-modal-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -100,14 +91,14 @@
     color: #fff;
 }
 
-.pedidosya-dialog__title {
+.pya-modal-header h3 {
     margin: 0;
     font-size: 20px;
     font-weight: 700;
 }
 
-.pedidosya-dialog__count {
-    font-size: 14px;
+.pya-count {
+    font-size: 13px;
     font-weight: 400;
     margin-left: 10px;
     background: rgba(255,255,255,0.25);
@@ -115,29 +106,15 @@
     border-radius: 12px;
 }
 
-.pedidosya-dialog__close {
+.pya-close {
     background: transparent;
     border: none;
     color: #fff;
     font-size: 22px;
     cursor: pointer;
-    line-height: 1;
-    padding: 0 4px;
 }
 
-/* Cuerpo vacío */
-.pedidosya-dialog__empty {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    color: #aaa;
-    padding: 40px;
-}
-
-/* Lista de pedidos */
-.pedidosya-dialog__list {
+.pya-modal-body {
     flex: 1;
     overflow-y: auto;
     padding: 16px;
@@ -146,24 +123,30 @@
     gap: 12px;
 }
 
-/* Footer */
-.pedidosya-dialog__footer {
+.pya-modal-footer {
     padding: 14px 24px;
     border-top: 1px solid #333;
     display: flex;
     justify-content: flex-end;
 }
 
+.pya-empty {
+    text-align: center;
+    color: #aaa;
+    font-size: 18px;
+    padding: 40px;
+}
+
 /* ── Tarjeta de pedido ───────────────────────────────────────────── */
 
-.pedidosya-order-card {
+.pya-card {
     background: #2a2a3d;
     border-radius: 12px;
     padding: 14px 16px;
     border-left: 4px solid #ff6b35;
 }
 
-.pedidosya-order-card__header {
+.pya-card-header {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -171,66 +154,22 @@
     flex-wrap: wrap;
 }
 
-.pedidosya-order-card__id {
-    font-weight: 700;
-    font-size: 16px;
-    color: #ff9a6c;
-}
+.pya-card-id     { font-weight: 700; font-size: 16px; color: #ff9a6c; }
+.pya-card-customer { font-size: 14px; color: #ccc; flex: 1; }
+.pya-card-total  { font-size: 16px; font-weight: 700; color: #7ee8a2; }
 
-.pedidosya-order-card__customer {
-    font-size: 14px;
-    color: #ccc;
-    flex: 1;
-}
+.pya-card-lines  { margin-bottom: 12px; font-size: 14px; color: #bbb; }
 
-.pedidosya-order-card__total {
-    font-size: 16px;
-    font-weight: 700;
-    color: #7ee8a2;
-}
+.pya-line { display: flex; gap: 6px; align-items: baseline; margin-bottom: 3px; }
+.pya-line-qty   { font-weight: 700; color: #ff9a6c; min-width: 28px; }
+.pya-line-name  { flex: 1; }
+.pya-line-notes { color: #888; font-style: italic; font-size: 12px; }
 
-/* Líneas de productos */
-.pedidosya-order-card__lines {
-    margin-bottom: 12px;
-    font-size: 14px;
-    color: #bbb;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
+.pya-card-actions { display: flex; gap: 10px; margin-top: 4px; }
 
-.pedidosya-order-card__line {
-    display: flex;
-    gap: 6px;
-    align-items: baseline;
-}
+/* ── Botones ─────────────────────────────────────────────────────── */
 
-.line-qty {
-    font-weight: 700;
-    color: #ff9a6c;
-    min-width: 28px;
-}
-
-.line-name {
-    flex: 1;
-}
-
-.line-notes {
-    color: #888;
-    font-style: italic;
-    font-size: 12px;
-}
-
-/* Acciones */
-.pedidosya-order-card__actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 4px;
-}
-
-/* ── Botones de acción ───────────────────────────────────────────── */
-
-.pedidosya-btn {
+.pya-btn {
     border: none;
     border-radius: 8px;
     padding: 9px 20px;
@@ -240,10 +179,11 @@
     transition: opacity 0.15s, transform 0.1s;
 }
 
-.pedidosya-btn:hover   { opacity: 0.88; }
-.pedidosya-btn:active  { transform: scale(0.96); }
-.pedidosya-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.pya-btn:hover    { opacity: 0.88; }
+.pya-btn:active   { transform: scale(0.96); }
+.pya-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-.pedidosya-btn--accept    { background: #27ae60; color: #fff; flex: 1; }
-.pedidosya-btn--reject    { background: #e74c3c; color: #fff; flex: 1; }
-.pedidosya-btn--secondary { background: #444; color: #ddd; }
+.pya-accept    { background: #27ae60; color: #fff; flex: 1; }
+.pya-reject    { background: #e74c3c; color: #fff; flex: 1; }
+.pya-secondary { background: #444; color: #ddd; }
+
