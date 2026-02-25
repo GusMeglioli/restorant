@@ -1,14 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- ── Logo de empresa (facturas, reportes, header) ────────────────── -->
-    <record id="main_company_branding" model="res.company">
-        <field name="id" ref="base.main_company"/>
+    <!-- ── Logo y Favicon de empresa ───────────────────────────────────── -->
+    <record id="base.main_company" model="res.company">
         <field name="logo" type="base64" file="gm_branding/static/src/img/gm_logo.png"/>
-    </record>
-
-    <!-- ── Favicon personalizado ────────────────────────────────────────── -->
-    <record id="favicon_branding" model="res.company">
-        <field name="id" ref="base.main_company"/>
         <field name="favicon" type="base64" file="gm_branding/static/src/img/favicon.png"/>
     </record>
 
