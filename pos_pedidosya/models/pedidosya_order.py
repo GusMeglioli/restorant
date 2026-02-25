@@ -76,12 +76,6 @@ class PedidosYaOrder(models.Model):
     order_total = fields.Float(string='Order Total')
     estimated_pickup_time = fields.Datetime(string='Estimated Pickup Time')
     is_preorder = fields.Boolean(string='Is Preorder', default=False)
-    
-    order_line_ids = fields.One2many(
-        comodel_name='pedidosya.order.line',
-        inverse_name='order_id',
-        string='Order Lines',
-    )
 
     # ── Auditoría ─────────────────────────────────────────────────────────────
     accepted_at = fields.Datetime(string='Accepted At')
@@ -98,58 +92,68 @@ class PedidosYaOrder(models.Model):
     ]
 
     def action_accept(self):
-        """Accept order and notify PedidosYa."""
+        """Accept order locally and try to notify PedidosYa middleware."""
         self.ensure_one()
         if self.state != 'received':
             raise UserError(_('Only orders in Received state can be accepted.'))
-        sync = self.env['pedidosya.sync']
-        result = sync.update_order_status(self, 'order_accepted')
-        if result:
-            self.write({
-                'state': 'accepted',
-                'accepted_at': fields.Datetime.now(),
-            })
-        return result
+        # Actualizar estado local siempre — independiente del middleware
+        self.write({
+            'state': 'accepted',
+            'accepted_at': fields.Datetime.now(),
+            'error_message': False,
+        })
+        # Intentar notificar al middleware (no bloqueante)
+        try:
+            self.env['pedidosya.sync'].update_order_status(self, 'order_accepted')
+        except Exception as e:
+            _logger.warning('PedidosYa sync accept fallido (no crítico): %s', str(e))
+        return True
 
     def action_reject(self, reason='technical_problem'):
-        """Reject order and notify PedidosYa."""
+        """Reject order locally and try to notify PedidosYa middleware."""
         self.ensure_one()
-        sync = self.env['pedidosya.sync']
-        result = sync.update_order_status(self, 'order_rejected', reason=reason)
-        if result:
-            self.write({
-                'state': 'rejected',
-                'reject_reason': reason,
-            })
-        return result
+        # Actualizar estado local siempre
+        self.write({
+            'state': 'rejected',
+            'reject_reason': reason,
+            'error_message': False,
+        })
+        # Intentar notificar al middleware (no bloqueante)
+        try:
+            self.env['pedidosya.sync'].update_order_status(self, 'order_rejected', reason=reason)
+        except Exception as e:
+            _logger.warning('PedidosYa sync reject fallido (no crítico): %s', str(e))
+        return True
 
     def action_mark_prepared(self):
         """Mark order as ready for pickup."""
         self.ensure_one()
         if self.state not in ('accepted', 'preparing'):
             raise UserError(_('Order must be accepted before marking as prepared.'))
-        sync = self.env['pedidosya.sync']
-        result = sync.mark_order_prepared(self)
-        if result:
-            self.write({
-                'state': 'ready',
-                'prepared_at': fields.Datetime.now(),
-            })
-        return result
+        self.write({
+            'state': 'ready',
+            'prepared_at': fields.Datetime.now(),
+        })
+        try:
+            self.env['pedidosya.sync'].mark_order_prepared(self)
+        except Exception as e:
+            _logger.warning('PedidosYa sync prepared fallido (no crítico): %s', str(e))
+        return True
 
     def action_mark_dispatched(self):
         """Mark order as picked up by rider."""
         self.ensure_one()
         if self.state != 'ready':
             raise UserError(_('Order must be ready for pickup before dispatching.'))
-        sync = self.env['pedidosya.sync']
-        result = sync.update_order_status(self, 'order_picked_up')
-        if result:
-            self.write({
-                'state': 'dispatched',
-                'dispatched_at': fields.Datetime.now(),
-            })
-        return result
+        self.write({
+            'state': 'dispatched',
+            'dispatched_at': fields.Datetime.now(),
+        })
+        try:
+            self.env['pedidosya.sync'].update_order_status(self, 'order_picked_up')
+        except Exception as e:
+            _logger.warning('PedidosYa sync dispatched fallido (no crítico): %s', str(e))
+        return True
 
     def action_view_pos_order(self):
         """Open related POS order."""
